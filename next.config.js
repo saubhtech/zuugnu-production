@@ -1,11 +1,9 @@
-module.exports = {
-  trailingSlash: true,
-  async rewrites() {
-    return [
-      {
-        source: '/:path*',
-        destination: '/:path*',
-      },
-    ];
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'standalone', // Important for Vercel
+  images: {
+    unoptimized: true,
   },
 }
+
+module.exports = nextConfig

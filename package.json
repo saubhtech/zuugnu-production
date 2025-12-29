@@ -2,13 +2,14 @@
   "name": "zuugnu-nextjs",
   "version": "0.1.0",
   "private": true,
+  
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "whatsapp": "cd whatsapp-server && npm start",
-    "dev:all": "concurrently \"npm run dev\" \"npm run whatsapp\""
+    "lint": "next lint"
   },
+
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "concurrently": "^9.2.1",
