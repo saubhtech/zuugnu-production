@@ -5,12 +5,19 @@ import Image from "next/image";
 import "./login.css";
 
 export default function LoginPage() {
-  // ✅ REQUIRED LOGIN STATES
+  const [registerName, setRegisterName] = useState("");
+  const [registerWhatsappNumber, setRegisterWhatsappNumber] = useState("");
+  const [registerCountryCode, setRegisterCountryCode] = useState("+91");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [password, setPassword] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
   const [loading, setLoading] = useState(false);
+  const [registerMessage, setRegisterMessage] = useState("");
   const [loginMessage, setLoginMessage] = useState("");
+
+  const handleRegister = async () => {
+    setRegisterMessage("Registration is currently disabled. Please contact admin.");
+  };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -68,6 +75,79 @@ export default function LoginPage() {
       </div>
 
       <div className="login-content">
+        {/* Register Card */}
+        <div className="auth-card">
+          <div className="card-logo">
+            <Image
+              src="/images/zuugnu.jpeg"
+              width={120}
+              height={120}
+              alt="Zuugnu Logo"
+              priority
+            />
+          </div>
+
+          <h2 className="card-title">
+            <span className="icon">👤</span> Register
+          </h2>
+
+          <p className="card-subtitle">Enter Your Details to Register</p>
+
+          <input
+            type="text"
+            className="register-input"
+            placeholder="Your Full Name (e.g., Yash Singh)"
+            value={registerName}
+            onChange={(e) => setRegisterName(e.target.value)}
+            disabled={loading}
+            style={{ marginBottom: "15px" }}
+          />
+
+          <div className="input-group">
+            <select
+              className="country-code"
+              value={registerCountryCode}
+              onChange={(e) => setRegisterCountryCode(e.target.value)}
+              disabled={loading}
+            >
+              <option value="+91">IN +91</option>
+              <option value="+1">US +1</option>
+              <option value="+44">UK +44</option>
+              <option value="+61">AU +61</option>
+            </select>
+          </div>
+
+          <div className="input-group whatsapp-input" style={{ marginBottom: "20px" }}>
+            <span className="whatsapp-icon">📱</span>
+            <input
+              type="tel"
+              className="form-input"
+              placeholder="WhatsApp number"
+              value={registerWhatsappNumber}
+              onChange={(e) =>
+                setRegisterWhatsappNumber(e.target.value.replace(/\D/g, ""))
+              }
+              disabled={loading}
+              maxLength="10"
+            />
+          </div>
+
+          <p className="receive-password">
+            You'll receive password via WhatsApp
+          </p>
+
+          <button className="whatsapp-btn" onClick={handleRegister} disabled={loading}>
+            {loading ? "Processing..." : "Register & Get Password"}
+          </button>
+
+          {registerMessage && (
+            <p className={`message ${registerMessage.includes("✅") ? "success" : "error"}`}>
+              {registerMessage}
+            </p>
+          )}
+        </div>
+
+        {/* Sign In Card */}
         <div className="auth-card">
           <div className="card-logo">
             <Image
@@ -82,12 +162,6 @@ export default function LoginPage() {
           <h2 className="card-title">
             <span className="icon">🔐</span> Sign In
           </h2>
-
-          <p style={{ fontSize: "12px", color: "#666", marginBottom: "10px" }}>
-            Demo Login:<br />
-            User: 9770370187 / user123<br />
-            Admin: 8800607598 / admin123
-          </p>
 
           <form onSubmit={handleSignIn}>
             <div className="input-group">
@@ -129,6 +203,16 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
               />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={(e) => {
+                  const input = e.currentTarget.previousElementSibling;
+                  input.type = input.type === "password" ? "text" : "password";
+                }}
+              >
+                👁️
+              </button>
             </div>
 
             <button
