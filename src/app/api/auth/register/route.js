@@ -1,94 +1,106 @@
 import { NextResponse } from "next/server";
-import { Pool } from "pg";
-import crypto from "crypto";
 
-// Production Database Connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || "postgres://saubhtech:Mala%40Ki%40Mani%401954@88.222.241.228:5432/saubh",
-  ssl: false // Set to true if your database requires SSL
-});
-
-function generatePassword() {
-  return crypto.randomBytes(3).toString("hex").toUpperCase();
+export async function POST() {
+  return NextResponse.json(
+    {
+      error: "Registration is disabled temporarily",
+    },
+    { status: 403 }
+  );
 }
 
-export async function POST(req) {
-  try {
-    const { fullName, whatsapp } = await req.json();
 
-    if (!fullName || !whatsapp) {
-      return NextResponse.json(
-        { error: "fullName or whatsapp missing" },
-        { status: 400 }
-      );
-    }
+// import { NextResponse } from "next/server";
+// import { Pool } from "pg";
+// import crypto from "crypto";
 
-    // Check if user already exists with this WhatsApp number
-    const existingUser = await pool.query(
-      `SELECT u.id, u.name, w.whatsapp 
-       FROM users u
-       JOIN user_whatsapp w ON u.id = w.user_id
-       WHERE w.whatsapp = $1`,
-      [whatsapp]
-    );
+// // Production Database Connection
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL || "postgres://saubhtech:Mala%40Ki%40Mani%401954@88.222.241.228:5432/saubh",
+//   ssl: false // Set to true if your database requires SSL
+// });
 
-    if (existingUser.rowCount > 0) {
-      return NextResponse.json({
-        success: false,
-        exists: true,
-        message: "User already exists with this WhatsApp number",
-        userName: existingUser.rows[0].name
-      }, { status: 409 });
-    }
+// function generatePassword() {
+//   return crypto.randomBytes(3).toString("hex").toUpperCase();
+// }
 
-    // Check if name already exists
-    const existingName = await pool.query(
-      `SELECT id, name FROM users WHERE LOWER(name) = LOWER($1)`,
-      [fullName]
-    );
+// export async function POST(req) {
+//   try {
+//     const { fullName, whatsapp } = await req.json();
 
-    if (existingName.rowCount > 0) {
-      return NextResponse.json({
-        success: false,
-        exists: true,
-        message: "User with this name already exists",
-        userName: existingName.rows[0].name
-      }, { status: 409 });
-    }
+//     if (!fullName || !whatsapp) {
+//       return NextResponse.json(
+//         { error: "fullName or whatsapp missing" },
+//         { status: 400 }
+//       );
+//     }
 
-    // Generate password
-    const password = generatePassword();
+//     // Check if user already exists with this WhatsApp number
+//     const existingUser = await pool.query(
+//       `SELECT u.id, u.name, w.whatsapp 
+//        FROM users u
+//        JOIN user_whatsapp w ON u.id = w.user_id
+//        WHERE w.whatsapp = $1`,
+//       [whatsapp]
+//     );
 
-    // Create new user
-    const userRes = await pool.query(
-      `INSERT INTO users (name)
-       VALUES ($1)
-       RETURNING id`,
-      [fullName]
-    );
+//     if (existingUser.rowCount > 0) {
+//       return NextResponse.json({
+//         success: false,
+//         exists: true,
+//         message: "User already exists with this WhatsApp number",
+//         userName: existingUser.rows[0].name
+//       }, { status: 409 });
+//     }
 
-    const userId = userRes.rows[0].id;
+//     // Check if name already exists
+//     const existingName = await pool.query(
+//       `SELECT id, name FROM users WHERE LOWER(name) = LOWER($1)`,
+//       [fullName]
+//     );
 
-    // Save whatsapp + password
-    await pool.query(
-      `INSERT INTO user_whatsapp (user_id, whatsapp, password)
-       VALUES ($1, $2, $3)`,
-      [userId, whatsapp, password]
-    );
+//     if (existingName.rowCount > 0) {
+//       return NextResponse.json({
+//         success: false,
+//         exists: true,
+//         message: "User with this name already exists",
+//         userName: existingName.rows[0].name
+//       }, { status: 409 });
+//     }
 
-    return NextResponse.json({
-      success: true,
-      exists: false,
-      password: password,
-      whatsapp: whatsapp,
-      message: `Hello! Your login credentials:\nWhatsApp: ${whatsapp}\nPassword: ${password}\n\nThank you for registering with Zuugnu!`
-    });
+//     // Generate password
+//     const password = generatePassword();
 
-  } catch (err) {
-    console.error("REGISTER ERROR:", err);
-    return NextResponse.json({ 
-      success: false,
-      error: "Server error occurred" 
-    }, { status: 500 });
-  }
-}
+//     // Create new user
+//     const userRes = await pool.query(
+//       `INSERT INTO users (name)
+//        VALUES ($1)
+//        RETURNING id`,
+//       [fullName]
+//     );
+
+//     const userId = userRes.rows[0].id;
+
+//     // Save whatsapp + password
+//     await pool.query(
+//       `INSERT INTO user_whatsapp (user_id, whatsapp, password)
+//        VALUES ($1, $2, $3)`,
+//       [userId, whatsapp, password]
+//     );
+
+//     return NextResponse.json({
+//       success: true,
+//       exists: false,
+//       password: password,
+//       whatsapp: whatsapp,
+//       message: `Hello! Your login credentials:\nWhatsApp: ${whatsapp}\nPassword: ${password}\n\nThank you for registering with Zuugnu!`
+//     });
+
+//   } catch (err) {
+//     console.error("REGISTER ERROR:", err);
+//     return NextResponse.json({ 
+//       success: false,
+//       error: "Server error occurred" 
+//     }, { status: 500 });
+//   }
+// }
