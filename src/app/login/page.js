@@ -5,82 +5,82 @@ import Image from "next/image";
 import "./login.css";
 
 export default function LoginPage() {
-  const [registerName, setRegisterName] = useState("");
-  const [registerWhatsappNumber, setRegisterWhatsappNumber] = useState("");
-  const [registerCountryCode, setRegisterCountryCode] = useState("+91");
-  const [whatsappNumber, setWhatsappNumber] = useState("");
+  // const [registerName, setRegisterName] = useState("");
+  // const [registerWhatsappNumber, setRegisterWhatsappNumber] = useState("");
+  // const [registerCountryCode, setRegisterCountryCode] = useState("+91");
+  // const [whatsappNumber, setWhatsappNumber] = useState("");
   const [password, setPassword] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
   const [loading, setLoading] = useState(false);
   const [registerMessage, setRegisterMessage] = useState("");
   const [loginMessage, setLoginMessage] = useState("");
 
-  const handleRegister = async () => {
-    if (!registerName.trim()) {
-      setRegisterMessage("Please enter your full name");
-      return;
-    }
+  // const handleRegister = async () => {
+  //   if (!registerName.trim()) {
+  //     setRegisterMessage("Please enter your full name");
+  //     return;
+  //   }
 
-    if (!registerWhatsappNumber.trim()) {
-      setRegisterMessage("Please enter your WhatsApp number");
-      return;
-    }
+  //   if (!registerWhatsappNumber.trim()) {
+  //     setRegisterMessage("Please enter your WhatsApp number");
+  //     return;
+  //   }
 
-    setLoading(true);
-    setRegisterMessage("");
+  //   setLoading(true);
+  //   setRegisterMessage("");
 
-    try {
-      const cleanName = registerName.replace(/^register\s+/i, "").trim();
-      const fullWhatsapp = registerCountryCode + registerWhatsappNumber;
+  //   try {
+  //     const cleanName = registerName.replace(/^register\s+/i, "").trim();
+  //     const fullWhatsapp = registerCountryCode + registerWhatsappNumber;
 
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: cleanName,
-          whatsapp: fullWhatsapp,
-        }),
-      });
+  //     const response = await fetch("/api/auth/register", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         fullName: cleanName,
+  //         whatsapp: fullWhatsapp,
+  //       }),
+  //     });
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      if (data.exists) {
-        setRegisterMessage(data.message);
-        setLoading(false);
-        return;
-      }
+  //     if (data.exists) {
+  //       setRegisterMessage(data.message);
+  //       setLoading(false);
+  //       return;
+  //     }
 
-      if (response.ok && data.success) {
-        const welcomeMessage = encodeURIComponent(
-          `Hello ${cleanName}!\n\n` +
-            `✅ Your registration is complete!\n\n` +
-            `📱 Login ID: ${fullWhatsapp}\n` +
-            `🔐 Password: ${data.password}\n\n` +
-            `🌐 Login at: zuugnu.com/login\n\n` +
-            `Thank you for registering with Zuugnu! 🎉`
-        );
+  //     if (response.ok && data.success) {
+  //       const welcomeMessage = encodeURIComponent(
+  //         `Hello ${cleanName}!\n\n` +
+  //           `✅ Your registration is complete!\n\n` +
+  //           `📱 Login ID: ${fullWhatsapp}\n` +
+  //           `🔐 Password: ${data.password}\n\n` +
+  //           `🌐 Login at: zuugnu.com/login\n\n` +
+  //           `Thank you for registering with Zuugnu! 🎉`
+  //       );
 
-        const whatsappUrl = `https://wa.me/${fullWhatsapp.replace(
-          "+",
-          ""
-        )}?text=${welcomeMessage}`;
-        window.open(whatsappUrl, "_blank");
+  //       const whatsappUrl = `https://wa.me/${fullWhatsapp.replace(
+  //         "+",
+  //         ""
+  //       )}?text=${welcomeMessage}`;
+  //       window.open(whatsappUrl, "_blank");
 
-        setRegisterMessage(
-          `✅ Registration successful! Password: ${data.password}. Check WhatsApp for details!`
-        );
-        setRegisterName("");
-        setRegisterWhatsappNumber("");
-      } else {
-        setRegisterMessage(data.error || "Registration failed. Please try again.");
-      }
-    } catch (error) {
-      setRegisterMessage("An error occurred. Please try again.");
-      console.error("Registration error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //       setRegisterMessage(
+  //         `✅ Registration successful! Password: ${data.password}. Check WhatsApp for details!`
+  //       );
+  //       setRegisterName("");
+  //       setRegisterWhatsappNumber("");
+  //     } else {
+  //       setRegisterMessage(data.error || "Registration failed. Please try again.");
+  //     }
+  //   } catch (error) {
+  //     setRegisterMessage("An error occurred. Please try again.");
+  //     console.error("Registration error:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -144,7 +144,7 @@ export default function LoginPage() {
 
       <div className="login-content">
         {/* Register Card */}
-        <div className="auth-card">
+        {/* <div className="auth-card">
           <div className="card-logo">
             <Image
               src="/images/zuugnu.jpeg"
@@ -213,7 +213,7 @@ export default function LoginPage() {
               {registerMessage}
             </p>
           )}
-        </div>
+        </div> */}
 
         {/* Sign In Card */}
         <div className="auth-card">

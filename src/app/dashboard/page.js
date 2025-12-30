@@ -49,7 +49,7 @@ export default function DashboardPage() {
   // 🚪 LOGOUT
   const handleLogout = () => {
     localStorage.removeItem('authUser');
-    router.push('/');
+    router.push('/logout');
   };
 
   // ⏳ LOADING STATE
