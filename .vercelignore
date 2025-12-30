@@ -1,2 +1,6 @@
-whatsapp-server/
-whatsapp-scanner/
+
+node_modules
+.next
+.env*.local
+whatsapp-server
+whatsapp-scanner
