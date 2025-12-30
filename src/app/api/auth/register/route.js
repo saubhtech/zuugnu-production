@@ -2,13 +2,10 @@ import { NextResponse } from "next/server";
 import { Pool } from "pg";
 import crypto from "crypto";
 
+// Production Database Connection
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 5432,
-  ssl: { rejectUnauthorized: false } // Required for cloud DB
+  connectionString: process.env.DATABASE_URL || "postgres://saubhtech:Mala%40Ki%40Mani%401954@88.222.241.228:5432/saubh",
+  ssl: false // Set to true if your database requires SSL
 });
 
 function generatePassword() {
@@ -36,7 +33,6 @@ export async function POST(req) {
     );
 
     if (existingUser.rowCount > 0) {
-      // User already exists
       return NextResponse.json({
         success: false,
         exists: true,
@@ -45,14 +41,13 @@ export async function POST(req) {
       }, { status: 409 });
     }
 
-    // Check if name already exists (optional - if you want to prevent duplicate names)
+    // Check if name already exists
     const existingName = await pool.query(
       `SELECT id, name FROM users WHERE LOWER(name) = LOWER($1)`,
       [fullName]
     );
 
     if (existingName.rowCount > 0) {
-      // Name exists but different WhatsApp number
       return NextResponse.json({
         success: false,
         exists: true,
@@ -81,7 +76,6 @@ export async function POST(req) {
       [userId, whatsapp, password]
     );
 
-    // Return success with password
     return NextResponse.json({
       success: true,
       exists: false,
