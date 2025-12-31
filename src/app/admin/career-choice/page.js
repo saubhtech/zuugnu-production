@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from 'next/dynamic';
 import "./career-choice.css";
 import Link from 'next/link';
 
