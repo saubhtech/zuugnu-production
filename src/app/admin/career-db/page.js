@@ -138,54 +138,52 @@ export default function CareerDBPage() {
   };
 
   const handleAddRecord = async () => {
-  if (!selectedTable) {
-    alert("Please select a table first");
-    return;
-  }
-  
-  let promptMessage = "Enter record name:";
-  
-  if (selectedTable === "career_data") {
-    promptMessage = "Enter career code (will be saved in 'careercode' column):";
-  }
-  
-  // IMPORTANT: Add this check
-  if (!mounted || typeof window === 'undefined') return;
-  
-  // Check if window.prompt exists (it won't during server build)
-  if (typeof window.prompt === 'undefined') {
-    console.log("prompt not available during build");
-    return;
-  }
-  
-  const recordValue = window.prompt(promptMessage);
-  if (recordValue) {
-    try {
-      const recordData = selectedTable === "career_data" 
-        ? { careercode: recordValue }
-        : { option: recordValue };
-        
-      const response = await fetch('/api/admin/career', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tableName: selectedTable,
-          record: recordData
-        })
-      });
-      
-      const data = await response.json();
-      if (data.success) {
-        alert("Record added successfully!");
-        await handleTableSelect(selectedTable);
-      } else {
-        alert("Error: " + data.error);
-      }
-    } catch (error) {
-      alert("Error adding record: " + error.message);
+    if (!selectedTable) {
+      alert("Please select a table first");
+      return;
     }
-  }
-};
+    
+    let promptMessage = "Enter record name:";
+    
+    if (selectedTable === "career_data") {
+      promptMessage = "Enter career code (will be saved in 'careercode' column):";
+    }
+    
+    // CRITICAL FIX: Check if we're in browser environment
+    if (typeof window === 'undefined' || !mounted) {
+      console.log("Skipping prompt during server-side rendering");
+      return;
+    }
+    
+    // Use a simple input instead of prompt for better compatibility
+    const recordValue = prompt(promptMessage);
+    if (recordValue) {
+      try {
+        const recordData = selectedTable === "career_data" 
+          ? { careercode: recordValue }
+          : { option: recordValue };
+          
+        const response = await fetch('/api/admin/career', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tableName: selectedTable,
+            record: recordData
+          })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          alert("Record added successfully!");
+          await handleTableSelect(selectedTable);
+        } else {
+          alert("Error: " + data.error);
+        }
+      } catch (error) {
+        alert("Error adding record: " + error.message);
+      }
+    }
+  };
 
   const getCsvNote = () => {
     if (selectedTable === "career_data") {
