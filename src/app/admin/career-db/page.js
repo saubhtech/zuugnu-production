@@ -1,5 +1,3 @@
-// /dashboard/src/app/admin/career-db/page.js
-
 
 "use client";
 export const dynamic = "force-dynamic";

@@ -1,15 +1,13 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import pkg from "pg";
 const { Pool } = pkg;
 import { parse } from 'csv-parse/sync';
 
 const pool = new Pool({
-  host: '88.222.241.228',
-  port: 5432,
-  database: 'saubh',
-  user: 'saubhtech',
-  password: 'ManiKiMala1954',
-  ssl: false
+  connectionString: process.env.DATABASE_URL,
+  ssl: false, // or { rejectUnauthorized: false } if needed
 });
 
 const validTables = [

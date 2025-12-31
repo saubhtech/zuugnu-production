@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 
 const WHATSAPP_SERVER = process.env.WHATSAPP_SERVER_URL || "http://localhost:3001";
