@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import "./master-admin.css";
 import Link from 'next/link';
 
-
 export default function MasterAdminPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [records, setRecords] = useState([]);
   const [masterOptions, setMasterOptions] = useState([]); // From mast_career_ability
   const [formData, setFormData] = useState({
@@ -20,7 +20,14 @@ export default function MasterAdminPage() {
   const [editingId, setEditingId] = useState(null);
   const router = useRouter();
 
+  // Add mounted check to prevent hydration mismatch
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
     const storedUser = localStorage.getItem("authUser");
     if (!storedUser) {
       router.push("/login");
@@ -33,7 +40,7 @@ export default function MasterAdminPage() {
     fetchMasterOptions();
     // Load existing records
     fetchRecords();
-  }, [router]);
+  }, [router, mounted]);
 
   const fetchMasterOptions = async () => {
     try {
@@ -179,22 +186,23 @@ export default function MasterAdminPage() {
     setMessage({ type: "", text: "" });
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  // Don't render until mounted to prevent hydration errors
+  if (!mounted || loading) return <div className="loading">Loading...</div>;
 
   return (
-
     <div className="master-admin-container">
-         <div className="admin-nav">
-      <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
-        <h3>Admin Navigation</h3>
-        <div style={{ display: 'flex', gap: '15px' }}>
-          <Link href="/admin/career-choice">Career Choice</Link>
-          <Link href="/admin/career-db">Career DB</Link>
-          <Link href="/admin/career-master">Career Master</Link>
-          <Link href="/admin/master-admin">Master Admin</Link>
-        </div>
-      </nav>
-    </div>
+      <div className="admin-nav">
+        <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
+          <h3>Admin Navigation</h3>
+          <div style={{ display: 'flex', gap: '15px' }}>
+            <Link href="/admin/career-choice">Career Choice</Link>
+            <Link href="/admin/career-db">Career DB</Link>
+            <Link href="/admin/career-master">Career Master</Link>
+            <Link href="/admin/master-admin">Master Admin</Link>
+          </div>
+        </nav>
+      </div>
+      
       <header className="admin-header">
         <h1>🎯 Career Choice Master Admin</h1>
         <p>Manage career choices and related data</p>

@@ -2,14 +2,14 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from 'next/dynamic';
 import "./career-choice.css";
 import Link from 'next/link';
-
-
 
 export default function CareerChoicePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [records, setRecords] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,7 +24,14 @@ export default function CareerChoicePage() {
   const fileInputRef = useRef(null);
   const router = useRouter();
 
+  // Add mounted check to prevent hydration mismatch
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
     const storedUser = localStorage.getItem("authUser");
     if (!storedUser) {
       router.push("/login");
@@ -32,17 +39,19 @@ export default function CareerChoicePage() {
     }
     setUser(JSON.parse(storedUser));
     setLoading(false);
-  }, [router]);
+  }, [router, mounted]);
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && mounted) {
       fetchRecords();
     }
-  }, [loading]);
+  }, [loading, mounted]);
 
   useEffect(() => {
-    handleSearch();
-  }, [searchTerm, records]);
+    if (mounted) {
+      handleSearch();
+    }
+  }, [searchTerm, records, mounted]);
 
   const fetchRecords = async () => {
     try {
@@ -217,22 +226,23 @@ export default function CareerChoicePage() {
   const uniqueChoices = new Set(records.map((r) => r.career_choice)).size;
   const uniqueCareers = new Set(records.map((r) => r.mast_career)).size;
 
-  if (loading) return <div className="loading">Loading...</div>;
+  // Don't render until mounted to prevent hydration errors
+  if (!mounted || loading) return <div className="loading">Loading...</div>;
 
   return (
-    
     <div className="container">
-         <div className="admin-nav">
-      <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
-        <h3>Admin Navigation</h3>
-        <div style={{ display: 'flex', gap: '15px' }}>
-          <Link href="/admin/career-choice">Career Choice</Link>
-          <Link href="/admin/career-db">Career DB</Link>
-          <Link href="/admin/career-master">Career Master</Link>
-          <Link href="/admin/master-admin">Master Admin</Link>
-        </div>
-      </nav>
-    </div>
+      <div className="admin-nav">
+        <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
+          <h3>Admin Navigation</h3>
+          <div style={{ display: 'flex', gap: '15px' }}>
+            <Link href="/admin/career-choice">Career Choice</Link>
+            <Link href="/admin/career-db">Career DB</Link>
+            <Link href="/admin/career-master">Career Master</Link>
+            <Link href="/admin/master-admin">Master Admin</Link>
+          </div>
+        </nav>
+      </div>
+      
       <div className="header">
         <h1>Career Choice Management</h1>
         <p>Manage all career choice records</p>
@@ -541,6 +551,5 @@ export default function CareerChoicePage() {
         </div>
       )}
     </div>
-    
   );
 }

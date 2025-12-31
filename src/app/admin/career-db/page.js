@@ -8,6 +8,7 @@ import Link from 'next/link';
 export default function CareerDBPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [selectedTable, setSelectedTable] = useState("");
   const [records, setRecords] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -15,7 +16,14 @@ export default function CareerDBPage() {
   const [file, setFile] = useState(null);
   const router = useRouter();
 
+  // Add mounted check to prevent hydration mismatch
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
     const storedUser = localStorage.getItem("authUser");
     
     if (!storedUser) {
@@ -25,7 +33,7 @@ export default function CareerDBPage() {
 
     setUser(JSON.parse(storedUser));
     setLoading(false);
-  }, [router]);
+  }, [router, mounted]);
 
   const tables = [
     "mast_career_ability",
@@ -178,21 +186,23 @@ export default function CareerDBPage() {
     }
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  // Don't render until mounted to prevent hydration errors
+  if (!mounted || loading) return <div className="loading">Loading...</div>;
 
   return (
-     <div className="career-db-container">
-       <div className="admin-nav">
-      <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
-        <h3>Admin Navigation</h3>
-        <div style={{ display: 'flex', gap: '15px' }}>
-          <Link href="/admin/career-choice">Career Choice</Link>
-          <Link href="/admin/career-db">Career DB</Link>
-          <Link href="/admin/career-master">Career Master</Link>
-          <Link href="/admin/master-admin">Master Admin</Link>
-        </div>
-      </nav>
-    </div>
+    <div className="career-db-container">
+      <div className="admin-nav">
+        <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
+          <h3>Admin Navigation</h3>
+          <div style={{ display: 'flex', gap: '15px' }}>
+            <Link href="/admin/career-choice">Career Choice</Link>
+            <Link href="/admin/career-db">Career DB</Link>
+            <Link href="/admin/career-master">Career Master</Link>
+            <Link href="/admin/master-admin">Master Admin</Link>
+          </div>
+        </nav>
+      </div>
+      
       <header className="db-header">
         <h1>📊 Career Database Manager</h1>
         <p>Manage all career-related tables with ease</p>

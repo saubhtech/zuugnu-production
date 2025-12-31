@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import "./career-master.css";
 import Link from 'next/link';
 
-
 export default function CareerMasterPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [currentTable, setCurrentTable] = useState("mast_career_ability");
   const [records, setRecords] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,7 +39,14 @@ export default function CareerMasterPage() {
     { value: "mast_career_zone", label: "Career Zone" },
   ];
 
+  // Add mounted check to prevent hydration mismatch
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
     const storedUser = localStorage.getItem("authUser");
     if (!storedUser) {
       router.push("/login");
@@ -47,13 +54,13 @@ export default function CareerMasterPage() {
     }
     setUser(JSON.parse(storedUser));
     setLoading(false);
-  }, [router]);
+  }, [router, mounted]);
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && mounted) {
       fetchRecords();
     }
-  }, [currentTable, loading]);
+  }, [currentTable, loading, mounted]);
 
   const fetchRecords = async () => {
     try {
@@ -160,58 +167,58 @@ export default function CareerMasterPage() {
     }
   };
 
- const handleFileUpload = async (e) => {
-  e.preventDefault();
-  const file = fileInputRef.current.files[0];
-  
-  if (!file) {
-    alert("Please select a CSV file");
-    return;
-  }
-
-  if (!file.name.toLowerCase().endsWith('.csv')) {
-    alert("Please upload a CSV file");
-    return;
-  }
-
-  setUploading(true);
-  setUploadMessage("");
-
-  const formData = new FormData();
-  formData.append("csvFile", file);
-  formData.append("tableName", currentTable);
-
-  try {
-    // Add a query parameter to distinguish CSV uploads
-    const response = await fetch(`/api/admin/career?upload=true`, {
-      method: "POST",
-      body: formData,
-      // DON'T set Content-Type header - browser sets it automatically for FormData
-    });
-
-    console.log("Upload response status:", response.status);
-    const data = await response.json();
-    console.log("Upload response data:", data);
+  const handleFileUpload = async (e) => {
+    e.preventDefault();
+    const file = fileInputRef.current.files[0];
     
-    if (data.success) {
-      setUploadMessage(`✅ Successfully imported ${data.insertedCount || data.inserted} records!`);
-      alert(`CSV imported successfully! ${data.insertedCount || data.inserted} records added to ${currentTable}`);
-      fetchRecords();
-      setTimeout(() => {
-        closeUploadModal();
-      }, 2000);
-    } else {
-      setUploadMessage(`❌ Error: ${data.message || data.error}`);
-      alert(`Error: ${data.message || data.error}`);
+    if (!file) {
+      alert("Please select a CSV file");
+      return;
     }
-  } catch (error) {
-    console.error("Upload error:", error);
-    setUploadMessage(`❌ Upload failed: ${error.message}`);
-    alert(`Upload failed: ${error.message}`);
-  } finally {
-    setUploading(false);
-  }
-};
+
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      alert("Please upload a CSV file");
+      return;
+    }
+
+    setUploading(true);
+    setUploadMessage("");
+
+    const formData = new FormData();
+    formData.append("csvFile", file);
+    formData.append("tableName", currentTable);
+
+    try {
+      // Add a query parameter to distinguish CSV uploads
+      const response = await fetch(`/api/admin/career?upload=true`, {
+        method: "POST",
+        body: formData,
+        // DON'T set Content-Type header - browser sets it automatically for FormData
+      });
+
+      console.log("Upload response status:", response.status);
+      const data = await response.json();
+      console.log("Upload response data:", data);
+      
+      if (data.success) {
+        setUploadMessage(`✅ Successfully imported ${data.insertedCount || data.inserted} records!`);
+        alert(`CSV imported successfully! ${data.insertedCount || data.inserted} records added to ${currentTable}`);
+        fetchRecords();
+        setTimeout(() => {
+          closeUploadModal();
+        }, 2000);
+      } else {
+        setUploadMessage(`❌ Error: ${data.message || data.error}`);
+        alert(`Error: ${data.message || data.error}`);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      setUploadMessage(`❌ Upload failed: ${error.message}`);
+      alert(`Upload failed: ${error.message}`);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const paginatedRecords = records.slice(
     (currentPage - 1) * perPage,
@@ -220,21 +227,23 @@ export default function CareerMasterPage() {
 
   const totalPages = Math.ceil(records.length / perPage);
 
-  if (loading) return <div className="loading">Loading...</div>;
+  // Don't render until mounted to prevent hydration errors
+  if (!mounted || loading) return <div className="loading">Loading...</div>;
 
   return (
- <div className="container">
-         <div className="admin-nav">
-      <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
-        <h3>Admin Navigation</h3>
-        <div style={{ display: 'flex', gap: '15px' }}>
-          <Link href="/admin/career-choice">Career Choice</Link>
-          <Link href="/admin/career-db">Career DB</Link>
-          <Link href="/admin/career-master">Career Master</Link>
-          <Link href="/admin/master-admin">Master Admin</Link>
-        </div>
-      </nav>
-    </div>
+    <div className="container">
+      <div className="admin-nav">
+        <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
+          <h3>Admin Navigation</h3>
+          <div style={{ display: 'flex', gap: '15px' }}>
+            <Link href="/admin/career-choice">Career Choice</Link>
+            <Link href="/admin/career-db">Career DB</Link>
+            <Link href="/admin/career-master">Career Master</Link>
+            <Link href="/admin/master-admin">Master Admin</Link>
+          </div>
+        </nav>
+      </div>
+      
       <div className="header">
         <h1>Career Master Tables Management</h1>
         <p>Manage all career master data tables in one place</p>
