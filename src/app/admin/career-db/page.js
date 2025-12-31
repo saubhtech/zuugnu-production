@@ -63,10 +63,18 @@ export default function CareerDBPage() {
         const response = await fetch(`/api/admin/career?table=${table}`);
         const data = await response.json();
         if (data.success) {
-          setRecords(data.records || []);
+          // Ensure all values are strings to prevent serialization issues
+          const sanitizedRecords = (data.records || []).map(record => {
+            const sanitized = {};
+            Object.keys(record).forEach(key => {
+              const value = record[key];
+              sanitized[key] = value === null || value === undefined ? '' : String(value);
+            });
+            return sanitized;
+          });
+          setRecords(sanitizedRecords);
         } else {
           setRecords([]);
-          console.error('Error fetching records:', data.error);
         }
       } catch (error) {
         console.error("Error fetching records:", error);
@@ -110,14 +118,11 @@ export default function CareerDBPage() {
       
       if (response.ok && data.success) {
         setUploadMessage(`✅ ${data.message}`);
-        // Refresh records after upload
         await handleTableSelect(selectedTable);
         setFile(null);
-        // Reset file input
         const fileInput = document.getElementById('csvFile');
         if (fileInput) fileInput.value = '';
       } else {
-        // Show detailed error message
         let errorMsg = data.error || 'Upload failed';
         if (data.hint) {
           errorMsg += `. ${data.hint}`;
@@ -133,61 +138,62 @@ export default function CareerDBPage() {
   };
 
   const handleAddRecord = async () => {
-  if (!selectedTable) {
-    alert("Please select a table first");
-    return;
-  }
-  
-  // Different prompt based on table type
-  let promptMessage = "Enter record name:";
-  
-  if (selectedTable === "career_data") {
-    promptMessage = "Enter career code (will be saved in 'careercode' column):";
-  }
-  
-  // Use window.prompt with mounted check
-  if (!mounted) return;
-  
-  const recordValue = window.prompt(promptMessage);
-  if (recordValue) {
-    try {
-      const recordData = selectedTable === "career_data" 
-        ? { careercode: recordValue }
-        : { option: recordValue };
-        
-      const response = await fetch('/api/admin/career', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tableName: selectedTable,
-          record: recordData
-        })
-      });
-      
-      const data = await response.json();
-      if (data.success) {
-        alert("Record added successfully!");
-        await handleTableSelect(selectedTable);
-      } else {
-        alert("Error: " + data.error);
-      }
-    } catch (error) {
-      alert("Error adding record: " + error.message);
+    if (!selectedTable) {
+      alert("Please select a table first");
+      return;
     }
-  }
-};
+    
+    let promptMessage = "Enter record name:";
+    
+    if (selectedTable === "career_data") {
+      promptMessage = "Enter career code (will be saved in 'careercode' column):";
+    }
+    
+    if (!mounted) return;
+    
+    const recordValue = window.prompt(promptMessage);
+    if (recordValue) {
+      try {
+        const recordData = selectedTable === "career_data" 
+          ? { careercode: recordValue }
+          : { option: recordValue };
+          
+        const response = await fetch('/api/admin/career', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tableName: selectedTable,
+            record: recordData
+          })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          alert("Record added successfully!");
+          await handleTableSelect(selectedTable);
+        } else {
+          alert("Error: " + data.error);
+        }
+      } catch (error) {
+        alert("Error adding record: " + error.message);
+      }
+    }
+  };
+
   const getCsvNote = () => {
     if (selectedTable === "career_data") {
-      return "📝 CSV should have column headers matching career_data table (e.g., maskId, careercode, Importance, zone)";
+      return "📝 CSV should have column headers matching career_data table";
     } else if (selectedTable === "careerchoice") {
-      return "📝 CSV should have column headers matching careerchoice table (e.g., career_choice, career_master)";
+      return "📝 CSV should have column headers matching careerchoice table";
     } else {
-      return "📝 CSV should have column headers matching database columns (e.g., option, importance, job_zone, code)";
+      return "📝 CSV should have column headers matching database columns";
     }
   };
 
   // Don't render until mounted to prevent hydration errors
-  if (!mounted || loading) return <div className="loading">Loading...</div>;
+  if (!mounted || loading) {
+    return <div className="loading">Loading...</div>;
+  }
 
   return (
     <div className="career-db-container">
@@ -225,7 +231,13 @@ export default function CareerDBPage() {
 
         <div className="record-info">
           <span>Records: {records.length}</span>
-          <button className="add-btn" onClick={handleAddRecord}>+ Add Record</button>
+          <button 
+            className="add-btn" 
+            onClick={handleAddRecord}
+            disabled={!selectedTable}
+          >
+            + Add Record
+          </button>
         </div>
       </div>
 
@@ -238,7 +250,10 @@ export default function CareerDBPage() {
           onChange={handleFileChange}
           disabled={uploading || !selectedTable}
         />
-        <button onClick={handleUpload} disabled={uploading || !file || !selectedTable}>
+        <button 
+          onClick={handleUpload} 
+          disabled={uploading || !file || !selectedTable}
+        >
           {uploading ? "Uploading..." : "Upload"}
         </button>
         {uploadMessage && (
@@ -270,7 +285,7 @@ export default function CareerDBPage() {
                     {records.map((record, index) => (
                       <tr key={index}>
                         {Object.values(record).map((value, idx) => (
-                          <td key={idx}>{value?.toString() || ''}</td>
+                          <td key={idx}>{value}</td>
                         ))}
                         <td>
                           <button className="edit-btn">Edit</button>
