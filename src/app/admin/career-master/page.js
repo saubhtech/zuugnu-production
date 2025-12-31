@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import "./career-choice.css";
+import "./career-master.css";
 import Link from 'next/link';
 
 export default function CareerChoicePage() {
