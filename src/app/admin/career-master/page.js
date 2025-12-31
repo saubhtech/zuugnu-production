@@ -119,7 +119,7 @@ export default function CareerMasterPage() {
           }),
         });
         const data = await response.json();
-        if (data.success) {
+        if (data.success && typeof window !== 'undefined') {
           alert("Record updated successfully!");
           fetchRecords();
           closeModal();
@@ -134,19 +134,21 @@ export default function CareerMasterPage() {
           }),
         });
         const data = await response.json();
-        if (data.success) {
+        if (data.success && typeof window !== 'undefined') {
           alert("Record added successfully!");
           fetchRecords();
           closeModal();
         }
       }
     } catch (error) {
-      alert("Error saving record: " + error.message);
+      if (typeof window !== 'undefined') {
+        alert("Error saving record: " + error.message);
+      }
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this record?")) return;
+    if (typeof window !== 'undefined' && !confirm("Are you sure you want to delete this record?")) return;
 
     try {
       const response = await fetch("/api/admin/career", {
@@ -158,12 +160,14 @@ export default function CareerMasterPage() {
         }),
       });
       const data = await response.json();
-      if (data.success) {
+      if (data.success && typeof window !== 'undefined') {
         alert("Record deleted successfully!");
         fetchRecords();
       }
     } catch (error) {
-      alert("Error deleting record: " + error.message);
+      if (typeof window !== 'undefined') {
+        alert("Error deleting record: " + error.message);
+      }
     }
   };
 
@@ -172,12 +176,12 @@ export default function CareerMasterPage() {
     const file = fileInputRef.current.files[0];
     
     if (!file) {
-      alert("Please select a CSV file");
+      if (typeof window !== 'undefined') alert("Please select a CSV file");
       return;
     }
 
     if (!file.name.toLowerCase().endsWith('.csv')) {
-      alert("Please upload a CSV file");
+      if (typeof window !== 'undefined') alert("Please upload a CSV file");
       return;
     }
 
@@ -189,11 +193,9 @@ export default function CareerMasterPage() {
     formData.append("tableName", currentTable);
 
     try {
-      // Add a query parameter to distinguish CSV uploads
       const response = await fetch(`/api/admin/career?upload=true`, {
         method: "POST",
         body: formData,
-        // DON'T set Content-Type header - browser sets it automatically for FormData
       });
 
       console.log("Upload response status:", response.status);
@@ -202,19 +204,25 @@ export default function CareerMasterPage() {
       
       if (data.success) {
         setUploadMessage(`✅ Successfully imported ${data.insertedCount || data.inserted} records!`);
-        alert(`CSV imported successfully! ${data.insertedCount || data.inserted} records added to ${currentTable}`);
+        if (typeof window !== 'undefined') {
+          alert(`CSV imported successfully! ${data.insertedCount || data.inserted} records added to ${currentTable}`);
+        }
         fetchRecords();
         setTimeout(() => {
           closeUploadModal();
         }, 2000);
       } else {
         setUploadMessage(`❌ Error: ${data.message || data.error}`);
-        alert(`Error: ${data.message || data.error}`);
+        if (typeof window !== 'undefined') {
+          alert(`Error: ${data.message || data.error}`);
+        }
       }
     } catch (error) {
       console.error("Upload error:", error);
       setUploadMessage(`❌ Upload failed: ${error.message}`);
-      alert(`Upload failed: ${error.message}`);
+      if (typeof window !== 'undefined') {
+        alert(`Upload failed: ${error.message}`);
+      }
     } finally {
       setUploading(false);
     }

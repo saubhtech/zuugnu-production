@@ -10,10 +10,10 @@ export default function MasterAdminPage() {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [records, setRecords] = useState([]);
-  const [masterOptions, setMasterOptions] = useState([]); // From mast_career_ability
+  const [masterOptions, setMasterOptions] = useState([]);
   const [formData, setFormData] = useState({
-    career_choice: "", // Selected from dropdown
-    career_master: ""  // User input
+    career_choice: "",
+    career_master: ""
   });
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -87,7 +87,6 @@ export default function MasterAdminPage() {
 
     try {
       if (editingId) {
-        // Update existing record
         const response = await fetch('/api/admin/career', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -111,7 +110,6 @@ export default function MasterAdminPage() {
           setMessage({ type: "error", text: data.error || "Failed to update record" });
         }
       } else {
-        // Add new record
         const response = await fetch('/api/admin/career', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -147,11 +145,16 @@ export default function MasterAdminPage() {
       career_master: record.career_master || ""
     });
     setEditingId(record.choiceid || record.mastid);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // FIX: Add browser check for scrollTo
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this record?")) return;
+    // FIX: Add browser check for confirm
+    if (typeof window !== 'undefined' && !confirm("Are you sure you want to delete this record?")) return;
 
     try {
       const response = await fetch('/api/admin/career', {
