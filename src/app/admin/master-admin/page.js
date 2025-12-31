@@ -1,8 +1,6 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import "./master-admin.css";
 import Link from 'next/link';
 
@@ -19,9 +17,7 @@ export default function MasterAdminPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [editingId, setEditingId] = useState(null);
-  const router = useRouter();
 
-  // Add mounted check to prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -31,7 +27,9 @@ export default function MasterAdminPage() {
     
     const storedUser = localStorage.getItem("authUser");
     if (!storedUser) {
-      router.push("/login");
+      if (typeof window !== 'undefined') {
+        window.location.href = "/login";
+      }
       return;
     }
     setUser(JSON.parse(storedUser));
@@ -41,7 +39,7 @@ export default function MasterAdminPage() {
     fetchMasterOptions();
     // Load existing records
     fetchRecords();
-  }, [router, mounted]);
+  }, [mounted]);
 
   const fetchMasterOptions = async () => {
     try {
@@ -147,14 +145,12 @@ export default function MasterAdminPage() {
     });
     setEditingId(record.choiceid || record.mastid);
     
-    // FIX: Add browser check for scrollTo
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleDelete = async (id) => {
-    // FIX: Add browser check for confirm
     if (typeof window !== 'undefined' && !confirm("Are you sure you want to delete this record?")) return;
 
     try {
@@ -181,6 +177,12 @@ export default function MasterAdminPage() {
     }
   };
 
+  const handleBackToCareerDB = () => {
+    if (typeof window !== 'undefined') {
+      window.location.href = "/admin/career-db";
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       career_choice: "",
@@ -190,7 +192,6 @@ export default function MasterAdminPage() {
     setMessage({ type: "", text: "" });
   };
 
-  // Don't render until mounted to prevent hydration errors
   if (!mounted || loading) return <div className="loading">Loading...</div>;
 
   return (
@@ -210,12 +211,11 @@ export default function MasterAdminPage() {
       <header className="admin-header">
         <h1>🎯 Career Choice Master Admin</h1>
         <p>Manage career choices and related data</p>
-        <button onClick={() => router.push("/admin/career-db")} className="back-btn">
+        <button onClick={handleBackToCareerDB} className="back-btn">
           ← Back to Upload
         </button>
       </header>
 
-      {/* Data Entry Form */}
       <div className="data-entry-card">
         <h2>Career Choice Data Entry Form</h2>
         
@@ -226,7 +226,6 @@ export default function MasterAdminPage() {
         )}
 
         <form onSubmit={handleSubmit} className="entry-form">
-          {/* Career Choice Field - Dropdown from master */}
           <div className="form-group">
             <label htmlFor="career_choice" className="required-label">
               Career Choice *
@@ -249,7 +248,6 @@ export default function MasterAdminPage() {
             <div className="input-hint">Select from master career abilities</div>
           </div>
 
-          {/* Career Master Field - User Input */}
           <div className="form-group">
             <label htmlFor="career_master">
               Career Master
@@ -266,7 +264,6 @@ export default function MasterAdminPage() {
             <div className="input-hint">Enter master category or grouping</div>
           </div>
 
-          {/* Form Actions */}
           <div className="form-actions">
             <button 
               type="submit" 
@@ -287,7 +284,6 @@ export default function MasterAdminPage() {
         </form>
       </div>
 
-      {/* Records Table */}
       <div className="records-section">
         <h2>All Records</h2>
         <p className="section-subtitle">View, Edit, and Delete Career Choices</p>

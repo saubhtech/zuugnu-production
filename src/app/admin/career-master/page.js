@@ -1,8 +1,6 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import "./career-master.css";
 import Link from 'next/link';
 
@@ -22,9 +20,7 @@ export default function CareerChoicePage() {
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState("");
   const fileInputRef = useRef(null);
-  const router = useRouter();
 
-  // Add mounted check to prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -34,12 +30,14 @@ export default function CareerChoicePage() {
     
     const storedUser = localStorage.getItem("authUser");
     if (!storedUser) {
-      router.push("/login");
+      if (typeof window !== 'undefined') {
+        window.location.href = "/login";
+      }
       return;
     }
     setUser(JSON.parse(storedUser));
     setLoading(false);
-  }, [router, mounted]);
+  }, [mounted]);
 
   useEffect(() => {
     if (!loading && mounted) {
@@ -171,7 +169,7 @@ export default function CareerChoicePage() {
 
   const handleFileUpload = async (e) => {
     e.preventDefault();
-    const file = fileInputRef.current.files[0];
+    const file = fileInputRef.current?.files?.[0];
 
     if (!file) {
       if (typeof window !== 'undefined') alert("Please select a CSV file");
@@ -234,7 +232,6 @@ export default function CareerChoicePage() {
   const uniqueChoices = new Set(records.map((r) => r.career_choice)).size;
   const uniqueCareers = new Set(records.map((r) => r.mast_career)).size;
 
-  // Don't render until mounted to prevent hydration errors
   if (!mounted || loading) return <div className="loading">Loading...</div>;
 
   return (
@@ -324,7 +321,7 @@ export default function CareerChoicePage() {
                 <th>Choice ID</th>
                 <th>Career Choice</th>
                 <th>Master Career</th>
-                                <th style={{ textAlign: "right" }}>Actions</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -419,7 +416,6 @@ export default function CareerChoicePage() {
         </div>
       </div>
 
-      {/* Add/Edit Modal */}
       {showModal && (
         <div
           className="modal show"
@@ -477,7 +473,6 @@ export default function CareerChoicePage() {
         </div>
       )}
 
-      {/* CSV Upload Modal */}
       {showUploadModal && (
         <div
           className="modal show"
@@ -561,4 +556,3 @@ export default function CareerChoicePage() {
     </div>
   );
 }
-
