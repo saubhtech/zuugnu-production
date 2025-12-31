@@ -133,49 +133,49 @@ export default function CareerDBPage() {
   };
 
   const handleAddRecord = async () => {
-    if (!selectedTable) {
-      alert("Please select a table first");
-      return;
-    }
-    
-    // Different prompt based on table type
-    let promptMessage = "Enter record name:";
-    let recordField = "option";
-    
-    if (selectedTable === "career_data") {
-      promptMessage = "Enter career code (will be saved in 'careercode' column):";
-      recordField = "careercode";
-    }
-    
-    const recordValue = prompt(promptMessage);
-    if (recordValue) {
-      try {
-        const recordData = selectedTable === "career_data" 
-          ? { careercode: recordValue }
-          : { option: recordValue };
-          
-        const response = await fetch('/api/admin/career', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            tableName: selectedTable,
-            record: recordData
-          })
-        });
+  if (!selectedTable) {
+    alert("Please select a table first");
+    return;
+  }
+  
+  // Different prompt based on table type
+  let promptMessage = "Enter record name:";
+  
+  if (selectedTable === "career_data") {
+    promptMessage = "Enter career code (will be saved in 'careercode' column):";
+  }
+  
+  // Use window.prompt with mounted check
+  if (!mounted) return;
+  
+  const recordValue = window.prompt(promptMessage);
+  if (recordValue) {
+    try {
+      const recordData = selectedTable === "career_data" 
+        ? { careercode: recordValue }
+        : { option: recordValue };
         
-        const data = await response.json();
-        if (data.success) {
-          alert("Record added successfully!");
-          await handleTableSelect(selectedTable);
-        } else {
-          alert("Error: " + data.error);
-        }
-      } catch (error) {
-        alert("Error adding record: " + error.message);
+      const response = await fetch('/api/admin/career', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tableName: selectedTable,
+          record: recordData
+        })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        alert("Record added successfully!");
+        await handleTableSelect(selectedTable);
+      } else {
+        alert("Error: " + data.error);
       }
+    } catch (error) {
+      alert("Error adding record: " + error.message);
     }
-  };
-
+  }
+};
   const getCsvNote = () => {
     if (selectedTable === "career_data") {
       return "📝 CSV should have column headers matching career_data table (e.g., maskId, careercode, Importance, zone)";
