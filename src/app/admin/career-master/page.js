@@ -2,17 +2,18 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import "./career-master.css";
+import "./career-choice.css";
 import Link from 'next/link';
 
-export default function CareerMasterPage() {
+export default function CareerChoicePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [currentTable, setCurrentTable] = useState("mast_career_ability");
   const [records, setRecords] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [modalMode, setModalMode] = useState("add");
@@ -21,23 +22,6 @@ export default function CareerMasterPage() {
   const [uploadMessage, setUploadMessage] = useState("");
   const fileInputRef = useRef(null);
   const router = useRouter();
-
-  const tables = [
-    { value: "mast_career_ability", label: "Career Ability" },
-    { value: "mast_career_activity", label: "Career Activity" },
-    { value: "mast_career_industry", label: "Career Industry" },
-    { value: "mast_career_interest", label: "Career Interest" },
-    { value: "mast_career_knowledge", label: "Career Knowledge" },
-    { value: "mast_career_outlook", label: "Career Outlook" },
-    { value: "mast_career_pathway", label: "Career Pathway" },
-    { value: "mast_career_preference", label: "Career Preference" },
-    { value: "mast_career_sector", label: "Career Sector" },
-    { value: "mast_career_skills", label: "Career Skills" },
-    { value: "mast_career_stem", label: "Career STEM" },
-    { value: "mast_career_technology", label: "Career Technology" },
-    { value: "mast_career_trait", label: "Career Trait" },
-    { value: "mast_career_zone", label: "Career Zone" },
-  ];
 
   // Add mounted check to prevent hydration mismatch
   useEffect(() => {
@@ -60,22 +44,39 @@ export default function CareerMasterPage() {
     if (!loading && mounted) {
       fetchRecords();
     }
-  }, [currentTable, loading, mounted]);
+  }, [loading, mounted]);
+
+  useEffect(() => {
+    if (mounted) {
+      handleSearch();
+    }
+  }, [searchTerm, records, mounted]);
 
   const fetchRecords = async () => {
     try {
-      const response = await fetch(`/api/admin/career?table=${currentTable}`);
+      const response = await fetch("/api/admin/career-choice");
       const data = await response.json();
       if (data.success) {
         setRecords(data.records || []);
+        setFilteredData(data.records || []);
       }
     } catch (error) {
       console.error("Error fetching records:", error);
     }
   };
 
-  const handleTableChange = (e) => {
-    setCurrentTable(e.target.value);
+  const handleSearch = () => {
+    if (searchTerm === "") {
+      setFilteredData(records);
+    } else {
+      const filtered = records.filter(
+        (record) =>
+          record.choiceid.toString().includes(searchTerm.toLowerCase()) ||
+          record.career_choice.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          record.mast_career.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
     setCurrentPage(1);
   };
 
@@ -105,17 +106,17 @@ export default function CareerMasterPage() {
   const handleSaveRecord = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const option = formData.get("option");
+    const career_choice = formData.get("career_choice");
+    const mast_career = formData.get("mast_career");
 
     try {
       if (modalMode === "edit" && editRecord) {
-        const response = await fetch("/api/admin/career", {
+        const response = await fetch("/api/admin/career-choice", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            tableName: currentTable,
-            id: editRecord.mastid,
-            record: { option },
+            id: editRecord.choiceid,
+            record: { career_choice, mast_career },
           }),
         });
         const data = await response.json();
@@ -125,12 +126,11 @@ export default function CareerMasterPage() {
           closeModal();
         }
       } else {
-        const response = await fetch("/api/admin/career", {
+        const response = await fetch("/api/admin/career-choice", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            tableName: currentTable,
-            record: { option },
+            record: { career_choice, mast_career },
           }),
         });
         const data = await response.json();
@@ -151,13 +151,10 @@ export default function CareerMasterPage() {
     if (typeof window !== 'undefined' && !confirm("Are you sure you want to delete this record?")) return;
 
     try {
-      const response = await fetch("/api/admin/career", {
+      const response = await fetch("/api/admin/career-choice", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tableName: currentTable,
-          id: id,
-        }),
+        body: JSON.stringify({ id }),
       });
       const data = await response.json();
       if (data.success && typeof window !== 'undefined') {
@@ -174,13 +171,13 @@ export default function CareerMasterPage() {
   const handleFileUpload = async (e) => {
     e.preventDefault();
     const file = fileInputRef.current.files[0];
-    
+
     if (!file) {
       if (typeof window !== 'undefined') alert("Please select a CSV file");
       return;
     }
 
-    if (!file.name.toLowerCase().endsWith('.csv')) {
+    if (!file.name.toLowerCase().endsWith(".csv")) {
       if (typeof window !== 'undefined') alert("Please upload a CSV file");
       return;
     }
@@ -190,22 +187,21 @@ export default function CareerMasterPage() {
 
     const formData = new FormData();
     formData.append("csvFile", file);
-    formData.append("tableName", currentTable);
 
     try {
-      const response = await fetch(`/api/admin/career?upload=true`, {
+      const response = await fetch("/api/admin/career-choice?upload=true", {
         method: "POST",
         body: formData,
       });
 
-      console.log("Upload response status:", response.status);
       const data = await response.json();
-      console.log("Upload response data:", data);
-      
+
       if (data.success) {
-        setUploadMessage(`✅ Successfully imported ${data.insertedCount || data.inserted} records!`);
+        setUploadMessage(
+          `✅ Successfully imported ${data.insertedCount || data.inserted} records!`
+        );
         if (typeof window !== 'undefined') {
-          alert(`CSV imported successfully! ${data.insertedCount || data.inserted} records added to ${currentTable}`);
+          alert(`CSV imported successfully! ${data.insertedCount || data.inserted} records added`);
         }
         fetchRecords();
         setTimeout(() => {
@@ -218,7 +214,6 @@ export default function CareerMasterPage() {
         }
       }
     } catch (error) {
-      console.error("Upload error:", error);
       setUploadMessage(`❌ Upload failed: ${error.message}`);
       if (typeof window !== 'undefined') {
         alert(`Upload failed: ${error.message}`);
@@ -228,12 +223,15 @@ export default function CareerMasterPage() {
     }
   };
 
-  const paginatedRecords = records.slice(
+  const paginatedRecords = filteredData.slice(
     (currentPage - 1) * perPage,
     currentPage * perPage
   );
 
-  const totalPages = Math.ceil(records.length / perPage);
+  const totalPages = Math.ceil(filteredData.length / perPage);
+
+  const uniqueChoices = new Set(records.map((r) => r.career_choice)).size;
+  const uniqueCareers = new Set(records.map((r) => r.mast_career)).size;
 
   // Don't render until mounted to prevent hydration errors
   if (!mounted || loading) return <div className="loading">Loading...</div>;
@@ -253,36 +251,51 @@ export default function CareerMasterPage() {
       </div>
       
       <div className="header">
-        <h1>Career Master Tables Management</h1>
-        <p>Manage all career master data tables in one place</p>
+        <h1>Career Choice Management</h1>
+        <p>Manage all career choice records</p>
       </div>
 
       <div className="content">
-        <div className="table-selector">
-          <div className="table-selector-header">
-            <h3>Select Master Table</h3>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-label">Total Records</div>
+            <div className="stat-value">{records.length}</div>
           </div>
-          <select value={currentTable} onChange={handleTableChange}>
-            {tables.map((table) => (
-              <option key={table.value} value={table.value}>
-                {table.label}
-              </option>
-            ))}
-          </select>
+          <div className="stat-card">
+            <div className="stat-label">Unique Career Choices</div>
+            <div className="stat-value">{uniqueChoices}</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">Unique Master Careers</div>
+            <div className="stat-value">{uniqueCareers}</div>
+          </div>
         </div>
 
         <div className="toolbar">
-          <div style={{ display: "flex", gap: "12px" }}>
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <button className="btn btn-primary" onClick={() => openModal("add")}>
-              <span>+</span> Add Single Record
+              <span>+</span> Add New Record
             </button>
             <button className="btn btn-success" onClick={openUploadModal}>
               📁 Upload CSV
             </button>
           </div>
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-            <div className="current-table-badge">
-              <span>{currentTable}</span>
+          <div style={{ display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
+            <div className="search-box">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search by ID, career choice, or master career..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
             <div className="view-selector">
               <label htmlFor="perPage">Show:</label>
@@ -307,17 +320,23 @@ export default function CareerMasterPage() {
           <table>
             <thead>
               <tr>
-                <th>Mast ID</th>
-                <th>Option</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th>Choice ID</th>
+                <th>Career Choice</th>
+                <th>Master Career</th>
+                                <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {paginatedRecords.length > 0 ? (
                 paginatedRecords.map((record) => (
-                  <tr key={record.mastid}>
-                    <td>{record.mastid}</td>
-                    <td>{record.option}</td>
+                  <tr key={record.choiceid}>
+                    <td>
+                      <span className="badge">{record.choiceid}</span>
+                    </td>
+                    <td>
+                      <strong>{record.career_choice}</strong>
+                    </td>
+                    <td>{record.mast_career}</td>
                     <td style={{ textAlign: "right" }}>
                       <div className="actions">
                         <button
@@ -328,7 +347,7 @@ export default function CareerMasterPage() {
                         </button>
                         <button
                           className="btn btn-danger btn-small"
-                          onClick={() => handleDelete(record.mastid)}
+                          onClick={() => handleDelete(record.choiceid)}
                         >
                           Delete
                         </button>
@@ -338,10 +357,22 @@ export default function CareerMasterPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3">
+                  <td colSpan="4">
                     <div className="empty-state">
-                      <h3>No records found</h3>
-                      <p>Get started by adding your first record or uploading a CSV</p>
+                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        ></path>
+                      </svg>
+                      <h3>{searchTerm ? "No records match your search" : "No records found"}</h3>
+                      <p>
+                        {searchTerm
+                          ? "Try adjusting your search terms"
+                          : "Get started by adding your first career choice record"}
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -352,11 +383,11 @@ export default function CareerMasterPage() {
 
         <div className="pagination">
           <div className="pagination-info">
-            {records.length > 0
+            {filteredData.length > 0
               ? `Showing ${(currentPage - 1) * perPage + 1} to ${Math.min(
                   currentPage * perPage,
-                  records.length
-                )} of ${records.length} entries`
+                  filteredData.length
+                )} of ${filteredData.length} entries${searchTerm ? " (filtered)" : ""}`
               : "No entries"}
           </div>
           <div className="pagination-controls">
@@ -389,28 +420,43 @@ export default function CareerMasterPage() {
 
       {/* Add/Edit Modal */}
       {showModal && (
-        <div className="modal show" onClick={(e) => e.target === e.currentTarget && closeModal()}>
+        <div
+          className="modal show"
+          onClick={(e) => e.target === e.currentTarget && closeModal()}
+        >
           <div className="modal-content">
             <div className="modal-header">
               <h2>{modalMode === "edit" ? "Edit Record" : "Add New Record"}</h2>
-              <div className="table-name">{currentTable}</div>
             </div>
             <form onSubmit={handleSaveRecord}>
               {modalMode === "edit" && (
                 <div className="form-group">
-                  <label>Mast ID</label>
-                  <input type="number" value={editRecord?.mastid} disabled />
+                  <label>Choice ID</label>
+                  <input type="number" value={editRecord?.choiceid} disabled />
                 </div>
               )}
               <div className="form-group">
-                <label htmlFor="option">Option *</label>
-                <textarea
-                  id="option"
-                  name="option"
+                <label htmlFor="career_choice">Career Choice *</label>
+                <input
+                  type="text"
+                  id="career_choice"
+                  name="career_choice"
                   required
-                  maxLength="255"
-                  defaultValue={editRecord?.option || ""}
-                  placeholder="Enter option value..."
+                  maxLength="200"
+                  defaultValue={editRecord?.career_choice || ""}
+                  placeholder="e.g., Software Engineer"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="mast_career">Master Career *</label>
+                <input
+                  type="text"
+                  id="mast_career"
+                  name="mast_career"
+                  required
+                  maxLength="100"
+                  defaultValue={editRecord?.mast_career || ""}
+                  placeholder="e.g., Technology & IT"
                 />
               </div>
               <div className="modal-footer">
@@ -432,12 +478,15 @@ export default function CareerMasterPage() {
 
       {/* CSV Upload Modal */}
       {showUploadModal && (
-        <div className="modal show" onClick={(e) => e.target === e.currentTarget && closeUploadModal()}>
+        <div
+          className="modal show"
+          onClick={(e) => e.target === e.currentTarget && closeUploadModal()}
+        >
           <div className="modal-content">
             <div className="modal-header">
-              <h2>Upload CSV to {currentTable}</h2>
+              <h2>Upload CSV to Career Choice</h2>
               <div className="table-name">
-                CSV must have one column: "option"
+                CSV must have two columns: "career_choice" and "mast_career"
               </div>
             </div>
             <form onSubmit={handleFileUpload}>
@@ -450,29 +499,39 @@ export default function CareerMasterPage() {
                   accept=".csv"
                   required
                 />
-                <small style={{ display: "block", marginTop: "8px", color: "#6b7280" }}>
-                  CSV format: One column named "option". Each row is one option value.
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "8px",
+                    color: "#6b7280",
+                  }}
+                >
+                  CSV format: Two columns named "career_choice" and "mast_career"
                   <br />
                   <strong>Example:</strong>
                   <br />
-                  option
+                  career_choice,mast_career
                   <br />
-                  Communication Skills
+                  Software Engineer,Technology & IT
                   <br />
-                  Problem Solving
+                  Doctor,Healthcare
                   <br />
-                  Leadership
+                  Teacher,Education
                 </small>
               </div>
-              
+
               {uploadMessage && (
-                <div style={{
-                  padding: "12px",
-                  marginBottom: "20px",
-                  borderRadius: "8px",
-                  backgroundColor: uploadMessage.includes("✅") ? "#d1fae5" : "#fee2e2",
-                  color: uploadMessage.includes("✅") ? "#065f46" : "#991b1b"
-                }}>
+                <div
+                  style={{
+                    padding: "12px",
+                    marginBottom: "20px",
+                    borderRadius: "8px",
+                    backgroundColor: uploadMessage.includes("✅")
+                      ? "#d1fae5"
+                      : "#fee2e2",
+                    color: uploadMessage.includes("✅") ? "#065f46" : "#991b1b",
+                  }}
+                >
                   {uploadMessage}
                 </div>
               )}
@@ -486,8 +545,8 @@ export default function CareerMasterPage() {
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="btn btn-success"
                   disabled={uploading}
                 >
@@ -501,3 +560,4 @@ export default function CareerMasterPage() {
     </div>
   );
 }
+
