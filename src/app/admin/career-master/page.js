@@ -223,10 +223,7 @@ export default function CareerMasterPage() {
   if (loading) return <div className="loading">Loading...</div>;
 
   return (
-
-    // Add this to the top of each admin page
-
-    <div className="container">
+ <div className="container">
          <div className="admin-nav">
       <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
         <h3>Admin Navigation</h3>

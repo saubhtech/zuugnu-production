@@ -183,9 +183,6 @@ export default function MasterAdminPage() {
 
   return (
 
-    // Add this to the top of each admin page
-
-
     <div className="master-admin-container">
          <div className="admin-nav">
       <nav style={{ padding: '10px', background: '#f5f5f5', marginBottom: '20px' }}>
