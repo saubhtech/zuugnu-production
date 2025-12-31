@@ -2,7 +2,6 @@
 
 "use client";
 
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import "./career-db.css";
@@ -18,25 +17,6 @@ export default function CareerDBPage() {
   const [uploadMessage, setUploadMessage] = useState("");
   const [file, setFile] = useState(null);
   const router = useRouter();
-
-  // Add mounted check to prevent hydration mismatch
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    
-    const storedUser = localStorage.getItem("authUser");
-    
-    if (!storedUser) {
-      router.push("/login");
-      return;
-    }
-
-    setUser(JSON.parse(storedUser));
-    setLoading(false);
-  }, [router, mounted]);
 
   const tables = [
     "mast_career_ability",
@@ -59,6 +39,24 @@ export default function CareerDBPage() {
     'career_data_test'
   ];
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
+    const storedUser = localStorage.getItem("authUser");
+    
+    if (!storedUser) {
+      router.push("/login");
+      return;
+    }
+
+    setUser(JSON.parse(storedUser));
+    setLoading(false);
+  }, [router, mounted]);
+
   const handleTableSelect = async (table) => {
     setSelectedTable(table);
     if (table) {
@@ -66,7 +64,6 @@ export default function CareerDBPage() {
         const response = await fetch(`/api/admin/career?table=${table}`);
         const data = await response.json();
         if (data.success) {
-          // Ensure all values are strings to prevent serialization issues
           const sanitizedRecords = (data.records || []).map(record => {
             const sanitized = {};
             Object.keys(record).forEach(key => {
@@ -89,8 +86,11 @@ export default function CareerDBPage() {
   };
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setUploadMessage("");
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setUploadMessage("");
+    }
   };
 
   const handleUpload = async () => {
@@ -123,6 +123,7 @@ export default function CareerDBPage() {
         setUploadMessage(`✅ ${data.message}`);
         await handleTableSelect(selectedTable);
         setFile(null);
+        // Clear file input
         const fileInput = document.getElementById('csvFile');
         if (fileInput) fileInput.value = '';
       } else {
@@ -141,6 +142,8 @@ export default function CareerDBPage() {
   };
 
   const handleAddRecord = async () => {
+    if (!mounted || typeof window === 'undefined') return;
+    
     if (!selectedTable) {
       alert("Please select a table first");
       return;
@@ -152,13 +155,6 @@ export default function CareerDBPage() {
       promptMessage = "Enter career code (will be saved in 'careercode' column):";
     }
     
-    // CRITICAL FIX: Check if we're in browser environment
-    if (typeof window === 'undefined' || !mounted) {
-      console.log("Skipping prompt during server-side rendering");
-      return;
-    }
-    
-    // Use a simple input instead of prompt for better compatibility
     const recordValue = prompt(promptMessage);
     if (recordValue) {
       try {
@@ -198,7 +194,6 @@ export default function CareerDBPage() {
     }
   };
 
-  // Don't render until mounted to prevent hydration errors
   if (!mounted || loading) {
     return <div className="loading">Loading...</div>;
   }
