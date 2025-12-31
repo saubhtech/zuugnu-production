@@ -1,0 +1,677 @@
+.career-db-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.db-header {
+  text-align: center;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 12px;
+}
+
+.db-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.db-header p {
+  margin: 10px 0 20px;
+  opacity: 0.9;
+}
+
+.db-header button {
+  background: white;
+  color: #667eea;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.db-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.table-selector label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.table-selector select {
+  padding: 10px;
+  font-size: 16px;
+  min-width: 300px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+}
+
+.record-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.add-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.csv-upload {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 2px dashed #cbd5e1;
+}
+
+.csv-upload h3 {
+  margin-top: 0;
+}
+
+.csv-upload input {
+  margin-right: 10px;
+}
+
+.csv-upload button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.records-table {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.records-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.records-table th {
+  background: #f1f5f9;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.records-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.records-table button {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.records-table button:last-child {
+  background: #ef4444;
+}
+
+.placeholder {
+  text-align: center;
+  padding: 60px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  color: #64748b;
+}
+
+.placeholder h2 {
+  color: #475569;
+}
+
+.upload-message {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.upload-message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.upload-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.csv-note {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.no-records {
+  text-align: center;
+  padding: 40px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.edit-btn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* career-db.css */
+
+.career-db-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.db-header {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.db-header h1 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 2rem;
+}
+
+.db-header p {
+  margin: 0 0 15px 0;
+  color: #666;
+}
+
+.db-header button {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.db-header button:hover {
+  background: #5a6268;
+}
+
+.db-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.table-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-selector label {
+  font-weight: 600;
+  color: #333;
+}
+
+.table-selector select {
+  padding: 8px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 200px;
+  transition: border-color 0.3s;
+}
+
+.table-selector select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.record-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.record-info span {
+  font-weight: bold;
+  color: #333;
+}
+
+.add-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.add-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.csv-upload {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.csv-upload h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.csv-upload input[type="file"] {
+  margin-right: 10px;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.csv-upload input[type="file"]:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.csv-upload button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.csv-upload button:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.csv-upload button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.upload-message {
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.upload-message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.upload-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.csv-note {
+  margin: 15px 0 0 0;
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.records-table {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.records-table h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.records-table h3 code {
+  background: #f1f1f1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+
+.records-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.records-table th {
+  background: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 15px;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+
+.records-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e9ecef;
+  color: #495057;
+  vertical-align: top;
+}
+
+.records-table tr:hover {
+  background: #f8fafc;
+}
+
+.records-table tr:last-child td {
+  border-bottom: none;
+}
+
+.records-table .edit-btn,
+.records-table .delete-btn {
+  padding: 6px 12px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.records-table .edit-btn {
+  background: #ffc107;
+  color: #212529;
+}
+
+.records-table .edit-btn:hover {
+  background: #e0a800;
+}
+
+.records-table .delete-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.records-table .delete-btn:hover {
+  background: #c82333;
+}
+
+.no-records, 
+.placeholder {
+  text-align: center;
+  padding: 50px 20px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 6px;
+  margin-top: 20px;
+}
+
+.placeholder h2 {
+  margin: 0 0 10px 0;
+  color: #495057;
+}
+
+.placeholder p {
+  margin: 0;
+  color: #6c757d;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #007bff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .career-db-container {
+    padding: 10px;
+  }
+  
+  .db-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .record-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .table-wrapper {
+    font-size: 12px;
+  }
+  
+  .records-table th,
+  .records-table td {
+    padding: 8px 10px;
+  }
+}
+
+/* Modern Admin Navigation */
+.admin-nav {
+  --primary-color: #4361ee;
+  --secondary-color: #3a0ca3;
+  --accent-color: #4cc9f0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin-bottom: 30px;
+}
+
+.admin-nav nav {
+  padding: 20px 25px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-nav nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(to bottom, #4361ee, #3a0ca3);
+}
+
+.admin-nav h3 {
+  margin: 0 0 20px 0;
+  color: #212529;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 10px;
+}
+
+.admin-nav h3::before {
+  content: "⚙️";
+  font-size: 1.3rem;
+}
+
+.admin-nav > nav > div {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-left: 10px;
+}
+
+.admin-nav a {
+  color: #495057;
+  text-decoration: none;
+  padding: 12px 24px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-nav a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.1), transparent);
+  transition: left 0.6s;
+}
+
+.admin-nav a:hover::before {
+  left: 100%;
+}
+
+.admin-nav a:hover {
+  background: white;
+  border-color: #4361ee;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(67, 97, 238, 0.15);
+  color: #4361ee;
+}
+
+/* Color-coded hover effects */
+.admin-nav a[href*="career-choice"]:hover {
+  border-color: #4361ee;
+  color: #4361ee;
+  box-shadow: 0 10px 20px rgba(67, 97, 238, 0.15);
+}
+
+.admin-nav a[href*="career-db"]:hover {
+  border-color: #f72585;
+  color: #f72585;
+  box-shadow: 0 10px 20px rgba(247, 37, 133, 0.15);
+}
+
+.admin-nav a[href*="career-master"]:hover {
+  border-color: #7209b7;
+  color: #7209b7;
+  box-shadow: 0 10px 20px rgba(114, 9, 183, 0.15);
+}
+
+.admin-nav a[href*="master-admin"]:hover {
+  border-color: #ff9e00;
+  color: #ff9e00;
+  box-shadow: 0 10px 20px rgba(255, 158, 0, 0.15);
+}
+
+/* Active page indicator */
+.admin-nav a[href*="career-choice"] {
+  background: #4361ee;
+  color: white;
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+}
+
+.admin-nav a[href*="career-choice"]:hover {
+  background: #3a56d4;
+  color: white;
+  border-color: #4361ee;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .admin-nav nav {
+    padding: 15px;
+  }
+  
+  .admin-nav > nav > div {
+    gap: 8px;
+  }
+  
+  .admin-nav a {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    text-align: center;
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  
+  .admin-nav h3 {
+    font-size: 1.3rem;
+  }
+}

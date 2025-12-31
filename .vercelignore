@@ -4,3 +4,8 @@ node_modules
 .env*.local
 whatsapp-server
 whatsapp-scanner
+*.log
+.git
+.vercel
+*.md
+*.txt

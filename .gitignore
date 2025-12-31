@@ -1,7 +1,6 @@
 # Dependencies
 node_modules/
-whatsapp-scanner/node_modules/
-whatsapp-server/node_modules/
+.next/
 .pnp
 .pnp.js
 
@@ -14,6 +13,8 @@ build/
 # Environment variables
 .env*.local
 .env
+.env.production
+.env.development
 
 # Logs
 *.log
@@ -30,14 +31,18 @@ Thumbs.db
 .idea/
 
 # OS generated files
-.DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
 Thumbs.db
-whatsapp-scanner/auth/
-whatsapp-scanner/node_modules/
-whatsapp-server/node_modules/
 
+# Test coverage
+coverage/
+.nyc_output/
+
+# Misc
+*.swp
+*.swo
+*~

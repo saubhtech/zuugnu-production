@@ -19,45 +19,60 @@ export default function LoginPage() {
     setRegisterMessage("Registration is currently disabled. Please contact admin.");
   };
 
-  const handleSignIn = async (e) => {
-    e.preventDefault();
+  // ❌ PROBLEM - `if (response.ok)` ka bracket close nahi hua
+// Ye code compile nahi hoga
 
-    if (!whatsappNumber.trim() || !password.trim()) {
-      setLoginMessage("Please enter both WhatsApp number and password");
-      return;
-    }
+// ✅ CORRECT VERSION:
+const handleSignIn = async (e) => {
+  e.preventDefault();
 
-    setLoading(true);
-    setLoginMessage("");
+  if (!whatsappNumber.trim() || !password.trim()) {
+    setLoginMessage("Please enter both WhatsApp number and password");
+    return;
+  }
 
-    try {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          whatsapp: countryCode + whatsappNumber,
-          password: password,
-        }),
-      });
+  setLoading(true);
+  setLoginMessage("");
 
-      const data = await response.json();
+  try {
+    const response = await fetch("/api/auth/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        whatsapp: countryCode + whatsappNumber,
+        password: password,
+      }),
+    });
 
-      if (response.ok) {
-        localStorage.setItem("authUser", JSON.stringify(data.user));
-        setLoginMessage("Login successful! Redirecting...");
-        setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 1000);
-      } else {
-        setLoginMessage(data.error || "Invalid credentials");
-      }
-    } catch (error) {
-      console.error("Sign in error:", error);
-      setLoginMessage("Server error. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const data = await response.json();
+
+   // src/app/login/page.js - handleSignIn function me
+if (response.ok) {
+  localStorage.setItem("authUser", JSON.stringify(data.user));
+  setLoginMessage("Login successful! Redirecting...");
+
+  if (password === "admin123") {
+    setTimeout(() => {
+      window.location.href = "/admin/career-db";
+    }, 1000);
+  } else if (password === "user123") {
+    // ✅ USER123 PE CAREER PAGE
+    setTimeout(() => {
+      window.location.href = "/career-choice";  // YEH PAGE
+    }, 1000);
+  } else {
+    setTimeout(() => {
+      window.location.href = "/dashboard";
+    }, 1000);
+  }
+}
+  } catch (error) {
+    console.error("Sign in error:", error);
+    setLoginMessage("Server error. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleForgotPassword = () => {
     const whatsappMessage = encodeURIComponent(
