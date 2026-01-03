@@ -152,7 +152,7 @@ export default function CareerChoicePage() {
   // ✅ SIMPLE STRING ARRAY WITH ICONS
   const filterOptions = {
     ability: [
-      "🧠 Select Ability",
+      " Select Ability",
       "📊 Analytical",
       "🎨 Creative",
       "⚙️ Technical",
@@ -160,7 +160,7 @@ export default function CareerChoicePage() {
       "🔧 Practical",
     ],
     activity: [
-      "🏃 Select Activity",
+      " Select Activity",
       "🏢 Indoor",
       "🌳 Outdoor",
       "🔄 Mixed",
@@ -168,7 +168,7 @@ export default function CareerChoicePage() {
       "💼 Desk Job",
     ],
     industry: [
-      "🏭 Select Industry",
+      " Select Industry",
       "💻 Technology",
       "🏥 Healthcare",
       "💰 Finance",
@@ -178,7 +178,7 @@ export default function CareerChoicePage() {
       "🏗️ Construction",
     ],
     interest: [
-      "❤️ Select Interest",
+      " Select Interest",
       "🔬 Technology",
       "🎭 Arts",
       "🧪 Science",
@@ -188,7 +188,7 @@ export default function CareerChoicePage() {
       "🔧 Engineering",
     ],
     knowledge: [
-      "🧠 Select Knowledge",
+      " Select Knowledge",
       "💾 Computer Science",
       "📊 Business",
       "⚙️ Engineering",
@@ -198,7 +198,7 @@ export default function CareerChoicePage() {
       "⚛️ Physics",
     ],
     outlook: [
-      "🔮 Select Outlook",
+      " Select Outlook",
       "🌟 Excellent",
       "👍 Good",
       "➖ Average",
@@ -206,7 +206,7 @@ export default function CareerChoicePage() {
       "🚀 Emerging",
     ],
     pathway: [
-      "🛣️ Select Pathway",
+      " Select Pathway",
       "🏛️ Traditional",
       "🔄 Alternative",
       "🔧 Vocational",
@@ -214,7 +214,7 @@ export default function CareerChoicePage() {
       "🎓 Academic",
     ],
     preference: [
-      "⭐ Select Preference",
+      " Select Preference",
       "🏠 Remote",
       "🏢🏠 Hybrid",
       "🏢 On-site",
@@ -222,7 +222,7 @@ export default function CareerChoicePage() {
       "✈️ Travel",
     ],
     sector: [
-      "🏛️ Select Sector",
+      " Select Sector",
       "🏛️ Public",
       "💼 Private",
       "🤝 Non-profit",
@@ -230,7 +230,7 @@ export default function CareerChoicePage() {
       "🚀 Startup",
     ],
     skills: [
-      "🛠️ Select Skills",
+      " Select Skills",
       "💬 Communication",
       "👑 Leadership",
       "🧩 Problem Solving",
@@ -240,7 +240,7 @@ export default function CareerChoicePage() {
       "📈 Analytical",
     ],
     stem: [
-      "🔬 Select STEM",
+      " Select STEM",
       "🧪 Science",
       "💻 Technology",
       "⚙️ Engineering",
@@ -249,7 +249,7 @@ export default function CareerChoicePage() {
       "📚 Non-STEM",
     ],
     technology: [
-      "🤖 Select Technology",
+      " Select Technology",
       "💾 Software",
       "🔧 Hardware",
       "🧠 AIML",
@@ -259,7 +259,7 @@ export default function CareerChoicePage() {
       "🚫 None",
     ],
     traits: [
-      "🌟 Select Traits",
+      " Select Traits",
       "🔍 Detail-oriented",
       "♟️ Strategic",
       "🤝 Collaborative",
@@ -311,21 +311,105 @@ export default function CareerChoicePage() {
   const filteredOccupations = handleSearch();
 
   const filterIcons = {
-    ability: "🧠",
-    activity: "🏃",
-    industry: "🏭",
-    interest: "❤️",
-    knowledge: "🧠",
-    outlook: "🔮",
-    pathway: "🛣️",
-    preference: "⭐",
-    sector: "🏛️",
-    skills: "🛠️",
-    stem: "🔬",
-    technology: "🤖",
-    traits: "🌟",
-    zone: "🗺️",
-  };
+  ability: (
+    <svg viewBox="0 0 64 64">
+      <circle cx="32" cy="20" r="8" />
+      <path d="M32 30L32 44M26 38L32 44L38 38" />
+    </svg>
+  ),
+
+  activity: (
+    <svg viewBox="0 0 64 64">
+      <rect x="12" y="20" width="40" height="32" rx="4" />
+      <circle cx="32" cy="36" r="6" />
+    </svg>
+  ),
+
+  industry: (
+    <svg viewBox="0 0 64 64">
+      <rect x="10" y="30" width="16" height="24" />
+      <rect x="30" y="20" width="16" height="34" />
+    </svg>
+  ),
+
+  interest: (
+    <svg viewBox="0 0 64 64">
+      <path d="M32 50L18 38C13 33 13 25 18 20C23 15 31 15 32 20C33 15 41 15 46 20C51 25 51 33 46 38L32 50Z" />
+    </svg>
+  ),
+
+  knowledge: (
+    <svg viewBox="0 0 64 64">
+      <rect x="16" y="14" width="32" height="36" />
+      <line x1="20" y1="24" x2="44" y2="24" />
+    </svg>
+  ),
+
+  outlook: (
+    <svg viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="20" />
+      <path d="M32 32L44 20" />
+    </svg>
+  ),
+
+  pathway: (
+    <svg viewBox="0 0 64 64">
+      <path d="M12 52L24 40L36 46L52 12" />
+      <circle cx="12" cy="52" r="4" />
+      <circle cx="24" cy="40" r="4" />
+      <circle cx="36" cy="46" r="4" />
+    </svg>
+  ),
+
+  preference: (
+    <svg viewBox="0 0 64 64">
+      <rect x="14" y="20" width="36" height="32" rx="4" />
+    </svg>
+  ),
+
+  sector: (
+    <svg viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="20" />
+      <line x1="32" y1="12" x2="32" y2="52" />
+      <line x1="12" y1="32" x2="52" y2="32" />
+    </svg>
+  ),
+
+  skills: (
+    <svg viewBox="0 0 64 64">
+      <path d="M32 10L38 28H56L42 39L47 56L32 45L17 56L22 39L8 28H26Z" />
+    </svg>
+  ),
+
+  stem: (
+    <svg viewBox="0 0 64 64">
+      <circle cx="32" cy="28" r="10" />
+      <line x1="22" y1="28" x2="42" y2="28" />
+    </svg>
+  ),
+
+  technology: (
+    <svg viewBox="0 0 64 64">
+      <rect x="10" y="16" width="44" height="32" rx="4" />
+      <line x1="32" y1="48" x2="32" y2="56" />
+    </svg>
+  ),
+
+  traits: (
+    <svg viewBox="0 0 64 64">
+      <circle cx="32" cy="24" r="10" />
+      <path d="M16 52C16 42 24 34 32 34C40 34 48 42 48 52" />
+    </svg>
+  ),
+
+  zone: (
+    <svg viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="20" />
+      <circle cx="32" cy="32" r="8" />
+    </svg>
+  ),
+};
+
 
   if (loading) return <div className="loading">Loading career data...</div>;
 
@@ -333,14 +417,38 @@ export default function CareerChoicePage() {
     <div className="career-container">
       <header className="career-header">
         <button className="home-btn" onClick={() => router.push("/dashboard")}>
-          <svg width="24" height="24" viewBox="0 0 24 24" >
+          <svg width="24" height="24" viewBox="0 0 24 24">
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
           </svg>
         </button>
 
         <div className="header-content">
-          <h1>🎯 Career Choice Explorer</h1>
-          <p>Find your perfect career match based on your preferences</p>
+          <h1 className="career-title">
+            <span className="title-icon">
+              {/* Career Explorer Icon */}
+              <svg viewBox="0 0 64 64" width="28" height="28" fill="none">
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="20"
+                  stroke="#4A90E2"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M32 32L42 22"
+                  stroke="#4A90E2"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <circle cx="32" cy="32" r="2" fill="#4A90E2" />
+              </svg>
+            </span>
+            Career Choice Explorer
+          </h1>
+
+          <p className="career-subtitle">
+            Find your perfect career match based on your preferences
+          </p>
         </div>
       </header>
 

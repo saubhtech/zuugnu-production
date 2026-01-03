@@ -279,3 +279,40 @@
   opacity: 0.95;
   margin: 0;
 }
+
+/* ===== FILTER LABEL ===== */
+.filter-item label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 6px;
+}
+
+/* ===== ICON CONTAINER ===== */
+.filter-icon {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== SVG VISIBILITY FIX ===== */
+.filter-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: #4f46e5 !important; /* force visible */
+  fill: none !important;
+  stroke-width: 2.5px;
+}
+
+/* Some icons need fill */
+.filter-icon svg circle,
+.filter-icon svg rect,
+.filter-icon svg path {
+  stroke: #4f46e5 !important;
+  fill: none;
+}
