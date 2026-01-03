@@ -275,7 +275,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
               />
-              <button
+              {/* <button
                 type="button"
                 className="toggle-password"
                 onClick={(e) => {
@@ -284,7 +284,7 @@ export default function LoginPage() {
                 }}
               >
                 👁️
-              </button>
+              </button> */}
             </div>
 
             <button
