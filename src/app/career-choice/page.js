@@ -8,18 +8,118 @@ export default function CareerChoicePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [occupations, setOccupations] = useState([
-    { id: 1, name: "Web Designer", abilities: "Creative", activities: "Indoor", knowledge: "Computer Science", preference: "Remote", skills: "UI/UX", technology: "Software", traits: "Detail-oriented" },
-    { id: 2, name: "Software Developer", abilities: "Analytical", activities: "Indoor", knowledge: "Engineering", preference: "Hybrid", skills: "Coding", technology: "Software", traits: "Strategic" },
-    { id: 3, name: "Data Scientist", abilities: "Analytical", activities: "Indoor", knowledge: "Computer Science", preference: "Remote", skills: "Problem Solving", technology: "AIML", traits: "Detail-oriented" },
-    { id: 4, name: "Healthcare Manager", abilities: "Social", activities: "Mixed", knowledge: "Business", preference: "On-site", skills: "Leadership", technology: "Hardware", traits: "Collaborative" },
-    { id: 5, name: "Financial Analyst", abilities: "Analytical", activities: "Indoor", knowledge: "Business", preference: "Hybrid", skills: "Problem Solving", technology: "Software", traits: "Strategic" },
-    { id: 6, name: "Mechanical Engineer", abilities: "Technical", activities: "Mixed", knowledge: "Engineering", preference: "On-site", skills: "Problem Solving", technology: "Hardware", traits: "Detail-oriented" },
-    { id: 7, name: "Teacher", abilities: "Social", activities: "Indoor", knowledge: "Education", preference: "On-site", skills: "Communication", technology: "Software", traits: "Collaborative" },
-    { id: 8, name: "Marketing Manager", abilities: "Creative", activities: "Mixed", knowledge: "Business", preference: "Hybrid", skills: "Leadership", technology: "Software", traits: "Strategic" },
-    { id: 9, name: "AI Specialist", abilities: "Analytical", activities: "Indoor", knowledge: "Computer Science", preference: "Remote", skills: "Problem Solving", technology: "AIML", traits: "Strategic" },
-    { id: 10, name: "Civil Engineer", abilities: "Technical", activities: "Outdoor", knowledge: "Engineering", preference: "On-site", skills: "Problem Solving", technology: "Hardware", traits: "Detail-oriented" },
+    {
+      id: 1,
+      name: "Web Designer",
+      abilities: "Creative",
+      activities: "Indoor",
+      knowledge: "Computer Science",
+      preference: "Remote",
+      skills: "UI/UX",
+      technology: "Software",
+      traits: "Detail-oriented",
+    },
+    {
+      id: 2,
+      name: "Software Developer",
+      abilities: "Analytical",
+      activities: "Indoor",
+      knowledge: "Engineering",
+      preference: "Hybrid",
+      skills: "Coding",
+      technology: "Software",
+      traits: "Strategic",
+    },
+    {
+      id: 3,
+      name: "Data Scientist",
+      abilities: "Analytical",
+      activities: "Indoor",
+      knowledge: "Computer Science",
+      preference: "Remote",
+      skills: "Problem Solving",
+      technology: "AIML",
+      traits: "Detail-oriented",
+    },
+    {
+      id: 4,
+      name: "Healthcare Manager",
+      abilities: "Social",
+      activities: "Mixed",
+      knowledge: "Business",
+      preference: "On-site",
+      skills: "Leadership",
+      technology: "Hardware",
+      traits: "Collaborative",
+    },
+    {
+      id: 5,
+      name: "Financial Analyst",
+      abilities: "Analytical",
+      activities: "Indoor",
+      knowledge: "Business",
+      preference: "Hybrid",
+      skills: "Problem Solving",
+      technology: "Software",
+      traits: "Strategic",
+    },
+    {
+      id: 6,
+      name: "Mechanical Engineer",
+      abilities: "Technical",
+      activities: "Mixed",
+      knowledge: "Engineering",
+      preference: "On-site",
+      skills: "Problem Solving",
+      technology: "Hardware",
+      traits: "Detail-oriented",
+    },
+    {
+      id: 7,
+      name: "Teacher",
+      abilities: "Social",
+      activities: "Indoor",
+      knowledge: "Education",
+      preference: "On-site",
+      skills: "Communication",
+      technology: "Software",
+      traits: "Collaborative",
+    },
+    {
+      id: 8,
+      name: "Marketing Manager",
+      abilities: "Creative",
+      activities: "Mixed",
+      knowledge: "Business",
+      preference: "Hybrid",
+      skills: "Leadership",
+      technology: "Software",
+      traits: "Strategic",
+    },
+    {
+      id: 9,
+      name: "AI Specialist",
+      abilities: "Analytical",
+      activities: "Indoor",
+      knowledge: "Computer Science",
+      preference: "Remote",
+      skills: "Problem Solving",
+      technology: "AIML",
+      traits: "Strategic",
+    },
+    {
+      id: 10,
+      name: "Civil Engineer",
+      abilities: "Technical",
+      activities: "Outdoor",
+      knowledge: "Engineering",
+      preference: "On-site",
+      skills: "Problem Solving",
+      technology: "Hardware",
+      traits: "Detail-oriented",
+    },
   ]);
-  
+
   const [filters, setFilters] = useState({
     ability: "",
     activity: "",
@@ -34,7 +134,7 @@ export default function CareerChoicePage() {
     stem: "",
     technology: "",
     traits: "",
-    zone: ""
+    zone: "",
   });
 
   const router = useRouter();
@@ -51,34 +151,158 @@ export default function CareerChoicePage() {
 
   // ✅ SIMPLE STRING ARRAY WITH ICONS
   const filterOptions = {
-    ability: ["🧠 Select Ability", "📊 Analytical", "🎨 Creative", "⚙️ Technical", "👥 Social", "🔧 Practical"],
-    activity: ["🏃 Select Activity", "🏢 Indoor", "🌳 Outdoor", "🔄 Mixed", "📍 Field Work", "💼 Desk Job"],
-    industry: ["🏭 Select Industry", "💻 Technology", "🏥 Healthcare", "💰 Finance", "📚 Education", "🏭 Manufacturing", "🛍️ Retail", "🏗️ Construction"],
-    interest: ["❤️ Select Interest", "🔬 Technology", "🎭 Arts", "🧪 Science", "📈 Business", "🩺 Healthcare", "✏️ Education", "🔧 Engineering"],
-    knowledge: ["🧠 Select Knowledge", "💾 Computer Science", "📊 Business", "⚙️ Engineering", "🩺 Healthcare", "📖 Education", "➗ Mathematics", "⚛️ Physics"],
-    outlook: ["🔮 Select Outlook", "🌟 Excellent", "👍 Good", "➖ Average", "📉 Declining", "🚀 Emerging"],
-    pathway: ["🛣️ Select Pathway", "🏛️ Traditional", "🔄 Alternative", "🔧 Vocational", "💻 Technical", "🎓 Academic"],
-    preference: ["⭐ Select Preference", "🏠 Remote", "🏢🏠 Hybrid", "🏢 On-site", "🔄 Flexible", "✈️ Travel"],
-    sector: ["🏛️ Select Sector", "🏛️ Public", "💼 Private", "🤝 Non-profit", "🇮🇳 Government", "🚀 Startup"],
-    skills: ["🛠️ Select Skills", "💬 Communication", "👑 Leadership", "🧩 Problem Solving", "🤝 Teamwork", "💻 Technical Skills", "🎨 Creativity", "📈 Analytical"],
-    stem: ["🔬 Select STEM", "🧪 Science", "💻 Technology", "⚙️ Engineering", "🧮 Mathematics", "🔬💻⚙️🧮 All STEM", "📚 Non-STEM"],
-    technology: ["🤖 Select Technology", "💾 Software", "🔧 Hardware", "🧠 AIML", "🤖 Robotics", "🧬 Biotech", "🌱 Clean Tech", "🚫 None"],
-    traits: ["🌟 Select Traits", "🔍 Detail-oriented", "♟️ Strategic", "🤝 Collaborative", "🦸 Independent", "🔄 Adaptable", "💪 Persistent", "💡 Innovative"],
-    zone: ["🗺️ Select Zone", "1️⃣ Zone 1", "2️⃣ Zone 2", "3️⃣ Zone 3", "4️⃣ Zone 4", "5️⃣ Zone 5"]
+    ability: [
+      "🧠 Select Ability",
+      "📊 Analytical",
+      "🎨 Creative",
+      "⚙️ Technical",
+      "👥 Social",
+      "🔧 Practical",
+    ],
+    activity: [
+      "🏃 Select Activity",
+      "🏢 Indoor",
+      "🌳 Outdoor",
+      "🔄 Mixed",
+      "📍 Field Work",
+      "💼 Desk Job",
+    ],
+    industry: [
+      "🏭 Select Industry",
+      "💻 Technology",
+      "🏥 Healthcare",
+      "💰 Finance",
+      "📚 Education",
+      "🏭 Manufacturing",
+      "🛍️ Retail",
+      "🏗️ Construction",
+    ],
+    interest: [
+      "❤️ Select Interest",
+      "🔬 Technology",
+      "🎭 Arts",
+      "🧪 Science",
+      "📈 Business",
+      "🩺 Healthcare",
+      "✏️ Education",
+      "🔧 Engineering",
+    ],
+    knowledge: [
+      "🧠 Select Knowledge",
+      "💾 Computer Science",
+      "📊 Business",
+      "⚙️ Engineering",
+      "🩺 Healthcare",
+      "📖 Education",
+      "➗ Mathematics",
+      "⚛️ Physics",
+    ],
+    outlook: [
+      "🔮 Select Outlook",
+      "🌟 Excellent",
+      "👍 Good",
+      "➖ Average",
+      "📉 Declining",
+      "🚀 Emerging",
+    ],
+    pathway: [
+      "🛣️ Select Pathway",
+      "🏛️ Traditional",
+      "🔄 Alternative",
+      "🔧 Vocational",
+      "💻 Technical",
+      "🎓 Academic",
+    ],
+    preference: [
+      "⭐ Select Preference",
+      "🏠 Remote",
+      "🏢🏠 Hybrid",
+      "🏢 On-site",
+      "🔄 Flexible",
+      "✈️ Travel",
+    ],
+    sector: [
+      "🏛️ Select Sector",
+      "🏛️ Public",
+      "💼 Private",
+      "🤝 Non-profit",
+      "🇮🇳 Government",
+      "🚀 Startup",
+    ],
+    skills: [
+      "🛠️ Select Skills",
+      "💬 Communication",
+      "👑 Leadership",
+      "🧩 Problem Solving",
+      "🤝 Teamwork",
+      "💻 Technical Skills",
+      "🎨 Creativity",
+      "📈 Analytical",
+    ],
+    stem: [
+      "🔬 Select STEM",
+      "🧪 Science",
+      "💻 Technology",
+      "⚙️ Engineering",
+      "🧮 Mathematics",
+      "🔬💻⚙️🧮 All STEM",
+      "📚 Non-STEM",
+    ],
+    technology: [
+      "🤖 Select Technology",
+      "💾 Software",
+      "🔧 Hardware",
+      "🧠 AIML",
+      "🤖 Robotics",
+      "🧬 Biotech",
+      "🌱 Clean Tech",
+      "🚫 None",
+    ],
+    traits: [
+      "🌟 Select Traits",
+      "🔍 Detail-oriented",
+      "♟️ Strategic",
+      "🤝 Collaborative",
+      "🦸 Independent",
+      "🔄 Adaptable",
+      "💪 Persistent",
+      "💡 Innovative",
+    ],
+    zone: [
+      "🗺️ Select Zone",
+      "1️⃣ Zone 1",
+      "2️⃣ Zone 2",
+      "3️⃣ Zone 3",
+      "4️⃣ Zone 4",
+      "5️⃣ Zone 5",
+    ],
   };
 
   const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({ ...prev, [filterType]: value }));
+    setFilters((prev) => ({ ...prev, [filterType]: value }));
   };
 
   const handleSearch = () => {
-    const filtered = occupations.filter(occ => {
+    const filtered = occupations.filter((occ) => {
       return (
-        (!filters.ability || filters.ability.includes("Select") || occ.abilities === filters.ability.replace(/^[^\w\s]+/, "").trim()) &&
-        (!filters.activity || filters.activity.includes("Select") || occ.activities === filters.activity.replace(/^[^\w\s]+/, "").trim()) &&
-        (!filters.preference || filters.preference.includes("Select") || occ.preference === filters.preference.replace(/^[^\w\s]+/, "").trim()) &&
-        (!filters.technology || filters.technology.includes("Select") || occ.technology === filters.technology.replace(/^[^\w\s]+/, "").trim()) &&
-        (!filters.traits || filters.traits.includes("Select") || occ.traits === filters.traits.replace(/^[^\w\s]+/, "").trim())
+        (!filters.ability ||
+          filters.ability.includes("Select") ||
+          occ.abilities === filters.ability.replace(/^[^\w\s]+/, "").trim()) &&
+        (!filters.activity ||
+          filters.activity.includes("Select") ||
+          occ.activities ===
+            filters.activity.replace(/^[^\w\s]+/, "").trim()) &&
+        (!filters.preference ||
+          filters.preference.includes("Select") ||
+          occ.preference ===
+            filters.preference.replace(/^[^\w\s]+/, "").trim()) &&
+        (!filters.technology ||
+          filters.technology.includes("Select") ||
+          occ.technology ===
+            filters.technology.replace(/^[^\w\s]+/, "").trim()) &&
+        (!filters.traits ||
+          filters.traits.includes("Select") ||
+          occ.traits === filters.traits.replace(/^[^\w\s]+/, "").trim())
       );
     });
     return filtered;
@@ -100,7 +324,7 @@ export default function CareerChoicePage() {
     stem: "🔬",
     technology: "🤖",
     traits: "🌟",
-    zone: "🗺️"
+    zone: "🗺️",
   };
 
   if (loading) return <div className="loading">Loading career data...</div>;
@@ -108,9 +332,16 @@ export default function CareerChoicePage() {
   return (
     <div className="career-container">
       <header className="career-header">
-        <h1>🎯 Career Choice Explorer</h1>
-        <p>Find your perfect career match based on your preferences</p>
-        <button onClick={() => router.push("/dashboard")}>← Back to Dashboard</button>
+        <button className="home-btn" onClick={() => router.push("/dashboard")}>
+          <svg width="24" height="24" viewBox="0 0 24 24" >
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+          </svg>
+        </button>
+
+        <div className="header-content">
+          <h1>🎯 Career Choice Explorer</h1>
+          <p>Find your perfect career match based on your preferences</p>
+        </div>
       </header>
 
       <div className="filters-section">
@@ -122,7 +353,7 @@ export default function CareerChoicePage() {
                 <span className="filter-icon">{filterIcons[filterKey]}</span>
                 Career {filterKey.charAt(0).toUpperCase() + filterKey.slice(1)}
               </label>
-              <select 
+              <select
                 value={filters[filterKey]}
                 onChange={(e) => handleFilterChange(filterKey, e.target.value)}
               >
@@ -135,14 +366,34 @@ export default function CareerChoicePage() {
             </div>
           ))}
         </div>
-        
+
         <div className="filter-actions">
-          <button className="apply-btn" onClick={handleSearch}>Apply Filters</button>
-          <button className="reset-btn" onClick={() => setFilters({
-            ability: "", activity: "", industry: "", interest: "", knowledge: "",
-            outlook: "", pathway: "", preference: "", sector: "", skills: "",
-            stem: "", technology: "", traits: "", zone: ""
-          })}>Reset All</button>
+          <button className="apply-btn" onClick={handleSearch}>
+            Apply Filters
+          </button>
+          <button
+            className="reset-btn"
+            onClick={() =>
+              setFilters({
+                ability: "",
+                activity: "",
+                industry: "",
+                interest: "",
+                knowledge: "",
+                outlook: "",
+                pathway: "",
+                preference: "",
+                sector: "",
+                skills: "",
+                stem: "",
+                technology: "",
+                traits: "",
+                zone: "",
+              })
+            }
+          >
+            Reset All
+          </button>
         </div>
       </div>
 
@@ -158,7 +409,7 @@ export default function CareerChoicePage() {
             </select>
             <span> entries</span>
           </div>
-          
+
           <div className="search-box">
             <input type="text" placeholder="Search careers..." />
             <button className="search-btn">🔍</button>
@@ -180,9 +431,11 @@ export default function CareerChoicePage() {
               </tr>
             </thead>
             <tbody>
-              {filteredOccupations.map(occ => (
+              {filteredOccupations.map((occ) => (
                 <tr key={occ.id}>
-                  <td><strong>{occ.name}</strong></td>
+                  <td>
+                    <strong>{occ.name}</strong>
+                  </td>
                   <td>{occ.abilities}</td>
                   <td>{occ.activities}</td>
                   <td>{occ.knowledge}</td>
@@ -197,7 +450,10 @@ export default function CareerChoicePage() {
         </div>
 
         <div className="pagination">
-          <span>Showing 1 to {filteredOccupations.length} of {occupations.length} records</span>
+          <span>
+            Showing 1 to {filteredOccupations.length} of {occupations.length}{" "}
+            records
+          </span>
           <div className="pagination-controls">
             <button>First</button>
             <button>Previous</button>

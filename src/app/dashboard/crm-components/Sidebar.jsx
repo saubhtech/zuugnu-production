@@ -4,13 +4,14 @@
 export default function Sidebar({ active, onChange }) {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: "📊" },
-    { id: "leads", label: "Leads", icon: "👥" },
-    { id: "campaigns", label: "Campaigns", icon: "📣" },
-    { id: "messages", label: "Messages", icon: "💬" },
-    { id: "team", label: "Team", icon: "👨‍👩‍👧‍👦" },
-    { id: "analytics", label: "Analytics", icon: "📈" },
-    { id: "templates", label: "Templates", icon: "📄" },
-    { id: "automation", label: "Automation", icon: "🤖" },
+    { id: "career-choice", label: "Career Choice", icon: "🎯" },
+    // { id: "leads", label: "Leads", icon: "👥" },
+    // { id: "campaigns", label: "Campaigns", icon: "📣" },
+    // { id: "messages", label: "Messages", icon: "💬" },
+    // { id: "team", label: "Team", icon: "👨‍👩‍👧‍👦" },
+    // { id: "analytics", label: "Analytics", icon: "📈" },
+    // { id: "templates", label: "Templates", icon: "📄" },
+    // { id: "automation", label: "Automation", icon: "🤖" },
     { id: "settings", label: "Settings", icon: "⚙️" },
   ];
 
