@@ -39,6 +39,11 @@
   border-radius: 12px;
   padding: 10px 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.home-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .header-content h1 {
@@ -67,6 +72,11 @@
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+  transition: transform 0.2s ease;
+}
+
+.filter-item:hover {
+  transform: translateY(-4px);
 }
 
 .filter-label {
@@ -94,6 +104,7 @@
   gap: 20px;
   max-width: 1400px;
   margin: 0 auto;
+  flex-wrap: wrap;
 }
 
 .apply-btn {
@@ -102,6 +113,7 @@
   padding: 10px 20px;
   border-radius: 8px;
   border: none;
+  cursor: pointer;
 }
 
 .reset-btn {
@@ -109,6 +121,7 @@
   padding: 10px 20px;
   border-radius: 8px;
   border: none;
+  cursor: pointer;
 }
 
 /* ===============================
@@ -136,6 +149,10 @@
   padding: 15px;
 }
 
+.career-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
 .occupation-name {
   font-weight: 600;
   color: #667eea;
@@ -144,16 +161,51 @@
 .graph-icon {
   cursor: pointer;
   font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+.graph-icon:hover {
+  transform: scale(1.2);
 }
 
 /* ===============================
-   PAGINATION
+   PAGINATION (RESTORED & SAFE)
 ================================ */
 .pagination {
   padding: 30px 40px;
   background: #f8f9fa;
   max-width: 1400px;
   margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.pagination-buttons button {
+  padding: 10px 20px;
+  background: white;
+  border: 2px solid #667eea;
+  color: #667eea;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.pagination-buttons button:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+}
+
+.pagination-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ===============================
@@ -169,7 +221,7 @@
 }
 
 /* ===============================
-   GRAPH MODAL (100% FIXED)
+   GRAPH MODAL (SCROLL + SAFE)
 ================================ */
 .graph-modal-overlay {
   position: fixed;
@@ -181,18 +233,17 @@
   z-index: 99999;
 }
 
-/* MODAL */
 .graph-modal {
+  position: relative;
   background: #ffffff;
   padding: 24px;
   width: min(720px, 92vw);
-  max-height: 85vh;        /* 👈 allows scroll */
-  overflow-y: auto;        /* 👈 enables vertical scroll */
+  max-height: 85vh;
+  overflow-y: auto;
   border-radius: 14px;
   box-shadow: 0 25px 60px rgba(0,0,0,0.25);
 }
 
-/* HEADER */
 .graph-modal-header {
   margin-bottom: 18px;
 }
@@ -205,35 +256,26 @@
   padding-right: 60px;
 }
 
-/* CLOSE BUTTON (GUARANTEED VISIBLE) */
+/* TOP CLOSE ICON */
 .graph-close-icon {
   position: absolute;
   top: 12px;
   right: 12px;
-
   width: 40px;
   height: 40px;
   border-radius: 50%;
   border: none;
-
   background: #ef4444;
-  color: #ffffff;
+  color: white;
   font-size: 22px;
-  font-weight: bold;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
   cursor: pointer;
-  z-index: 100000;
 }
 
 .graph-close-icon:hover {
   background: #dc2626;
 }
 
-/* GRAPH BARS */
+/* GRAPH */
 .graph-bars {
   display: grid;
   gap: 12px;
@@ -267,17 +309,15 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  border-radius: 999px;
 }
 
-/* Footer with close button */
+/* BOTTOM CLOSE BUTTON – SCOPED */
 .graph-modal-footer {
   margin-top: 24px;
   text-align: center;
 }
 
-/* Close button */
-.close-btn {
+.graph-modal .close-btn {
   padding: 10px 24px;
   background: #667eea;
   color: white;
@@ -288,6 +328,6 @@
   cursor: pointer;
 }
 
-.close-btn:hover {
+.graph-modal .close-btn:hover {
   background: #5568d3;
 }
