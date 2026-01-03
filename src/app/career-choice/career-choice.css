@@ -1,318 +1,293 @@
-.filter-icon {
-  margin-right: 8px;
-  font-size: 1.2em;
-}
-
-.filter-item select option {
-  font-size: 16px;
-  padding: 10px;
-}
-
-.loading {
-  text-align: center;
-  padding: 100px;
-  font-size: 1.2rem;
-  color: #4f46e5;
-}
-
-.filters-section h2 {
-  margin-bottom: 20px;
-  color: #374151;
-}
-
-.filter-actions {
-  display: flex;
-  gap: 15px;
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.apply-btn {
-  background: #4f46e5;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.reset-btn {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  padding: 12px 24px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.search-box {
-  display: flex;
-  gap: 10px;
-}
-
-.search-btn {
-  background: #4f46e5;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-.career-container {
-  padding: 20px;
-  max-width: 1400px;
-  margin: 0 auto;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-.career-header {
-  text-align: center;
-  margin-bottom: 30px;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  color: white;
-  padding: 30px;
-  border-radius: 12px;
-}
-
-.career-header h1 {
+/* ===============================
+   GLOBAL RESET
+================================ */
+* {
   margin: 0;
-  font-size: 2.5rem;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.career-header p {
-  margin: 10px 0 20px;
-  opacity: 0.9;
+/* ===============================
+   MAIN CONTAINER
+================================ */
+.career-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
 }
 
-.career-header button {
-  background: white;
-  color: #4f46e5;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.filters-section {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.filters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-}
-
-.filter-item label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #374151;
-}
-
-.filter-item select {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  background: white;
-}
-
-.results-section {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.results-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.entries-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.entries-info select {
-  padding: 6px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-}
-
-.search-box input {
-  padding: 10px 15px;
-  border: 2px solid #d1d5db;
-  border-radius: 6px;
-  min-width: 300px;
-  font-size: 14px;
-}
-
-.career-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-}
-
-.career-table th {
-  background: #f3f4f6;
-  padding: 15px;
-  text-align: left;
-  border-bottom: 2px solid #e5e7eb;
-  color: #374151;
-  font-weight: 600;
-}
-
-.career-table td {
-  padding: 15px;
-  border-bottom: 1px solid #e5e7eb;
-  color: #4b5563;
-}
-
-.career-table tr:hover {
-  background: #f9fafb;
-}
-
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.pagination-controls button {
-  padding: 8px 16px;
-  margin-left: 10px;
-  border: 1px solid #d1d5db;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.pagination-controls button:hover {
-  background: #f3f4f6;
-}
-
+/* ===============================
+   HEADER
+================================ */
 .career-header {
-  position: relative;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 40px 20px;
+  padding: 40px;
   text-align: center;
-  border-radius: 16px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 20px 20px 0 0;
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .home-btn {
   position: absolute;
   left: 20px;
   top: 20px;
-
-  /* Blue glass background */
-  background: rgba(102, 126, 234, 0.25); /* header blue */
-  backdrop-filter: blur(10px);
-
-  border: 2px solid rgba(102, 126, 234, 0.6);
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   padding: 10px 12px;
+  cursor: pointer;
+}
+
+.header-content h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+/* ===============================
+   FILTERS
+================================ */
+.filters-section {
+  background: #f8f9fa;
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.filter-item {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+}
+
+.filter-label {
+  display: flex;
+  gap: 10px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.filter-item select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+}
+
+/* ===============================
+   CONTROLS
+================================ */
+.controls {
+  padding: 30px 40px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.apply-btn {
+  background: #667eea;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+}
+
+.reset-btn {
+  background: #e5e7eb;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+}
+
+/* ===============================
+   TABLE
+================================ */
+.table-section {
+  padding: 40px;
+  background: white;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.career-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.career-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.career-table th,
+.career-table td {
+  padding: 15px;
+}
+
+.occupation-name {
+  font-weight: 600;
+  color: #667eea;
+}
+
+.graph-icon {
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* ===============================
+   PAGINATION
+================================ */
+.pagination {
+  padding: 30px 40px;
+  background: #f8f9fa;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===============================
+   LOADING
+================================ */
+.loading {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+}
+
+/* ===============================
+   GRAPH MODAL (100% FIXED)
+================================ */
+.graph-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+/* MODAL */
+.graph-modal {
+  background: #ffffff;
+  padding: 24px;
+  width: min(720px, 92vw);
+  max-height: 85vh;        /* 👈 allows scroll */
+  overflow-y: auto;        /* 👈 enables vertical scroll */
+  border-radius: 14px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+}
+
+/* HEADER */
+.graph-modal-header {
+  margin-bottom: 18px;
+}
+
+.graph-modal-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  padding-right: 60px;
+}
+
+/* CLOSE BUTTON (GUARANTEED VISIBLE) */
+.graph-close-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: bold;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   cursor: pointer;
-  transition: all 0.3s ease;
+  z-index: 100000;
+}
 
-  display: flex;
+.graph-close-icon:hover {
+  background: #dc2626;
+}
+
+/* GRAPH BARS */
+.graph-bars {
+  display: grid;
+  gap: 12px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
 }
 
-/* Make the icon blue */
-.home-btn svg {
-  color: #667eea;   /* same as header start color */
-  width: 22px;
-  height: 22px;
+.bar-label {
+  font-size: 14px;
+  color: #334155;
 }
 
-/* Hover state */
-.home-btn:hover {
-  background: rgba(102, 126, 234, 0.45);
-  border-color: #667eea;
-  transform: scale(1.05);
+.bar {
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
 }
 
-.home-btn svg {
-  display: block;
-}
-
-.header-content {
-  margin-top: 0;
-}
-
-.career-header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-.career-header p {
-  font-size: 1.1rem;
-  opacity: 0.95;
-  margin: 0;
-}
-
-/* ===== FILTER LABEL ===== */
-.filter-item label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  color: white;
+  font-size: 12px;
   font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 6px;
-}
-
-/* ===== ICON CONTAINER ===== */
-.filter-icon {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  display: inline-flex;
+  padding-right: 10px;
+  display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  border-radius: 999px;
 }
 
-/* ===== SVG VISIBILITY FIX ===== */
-.filter-icon svg {
-  width: 20px;
-  height: 20px;
-  stroke: #4f46e5 !important; /* force visible */
-  fill: none !important;
-  stroke-width: 2.5px;
+/* Footer with close button */
+.graph-modal-footer {
+  margin-top: 24px;
+  text-align: center;
 }
 
-/* Some icons need fill */
-.filter-icon svg circle,
-.filter-icon svg rect,
-.filter-icon svg path {
-  stroke: #4f46e5 !important;
-  fill: none;
+/* Close button */
+.close-btn {
+  padding: 10px 24px;
+  background: #667eea;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background: #5568d3;
 }
