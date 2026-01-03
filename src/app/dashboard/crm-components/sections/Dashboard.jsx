@@ -1,5 +1,27 @@
 // Dashboard.jsx
+"use client";
+
+import { useEffect, useState } from "react";
+
 export default function Dashboard() {
+
+   const [user, setUser] = useState(null);
+
+  // ✅ FIX: fetch user name from backend
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user/me");
+        const data = await res.json();
+        setUser(data);
+      } catch (err) {
+        console.error("Failed to fetch user", err);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   // ================= STYLE DEFINITIONS =================
   const dashboardContainerStyle = {
     flex: 1,
@@ -8,7 +30,7 @@ export default function Dashboard() {
     padding: "20px",
     backgroundColor: "#f5f7fa",
   };
-
+  
   const statsGrid = {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
@@ -143,30 +165,45 @@ export default function Dashboard() {
   return (
     <div style={dashboardContainerStyle}>
       {/* ================= HEADER ================= */}
-      <div className="header">
+     <div className="header">
         <div className="welcome-section">
-          <h2>Welcome, Yash Singh</h2>
+          <h2>Welcome, {user?.name || "User"}</h2>
           <p style={{ color: "#64748b", fontSize: "14px", marginTop: "4px" }}>
             Manage your WhatsApp CRM from here
           </p>
         </div>
-        
+
         <div className="header-right">
           <div className="search-bar">
             <i className="fas fa-search" style={{ color: "#94a3b8" }}></i>
-            <input type="text" placeholder="Search leads, campaigns, messages..." />
+            <input
+              type="text"
+              placeholder="Search leads, campaigns, messages..."
+            />
             <div className="search-icon">
               <i className="fas fa-search" style={{ color: "#475569" }}></i>
             </div>
           </div>
-          
+
           <div className="user-profile">
-            <div className="user-avatar">JD</div>
-            <div className="user-dropdown">
-              <span>John Doe</span>
-              <i className="fas fa-chevron-down" style={{ marginLeft: "8px", fontSize: "12px" }}></i>
+            <div className="user-avatar">
+              {user?.name
+                ? user.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()
+                    .slice(0, 2)
+                : "U"}
             </div>
-            <button className="logout-btn" >Logout</button>
+            <div className="user-dropdown">
+              <span>{user?.name || "User"}</span>
+              <i
+                className="fas fa-chevron-down"
+                style={{ marginLeft: "8px", fontSize: "12px" }}
+              ></i>
+            </div>
+            <button className="logout-btn">Logout</button>
           </div>
         </div>
       </div>
@@ -284,12 +321,19 @@ function StatCard({ title, value, trend, trendText, color }) {
         {value}
       </h2>
       <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-        <span style={{ color: trend.startsWith("-") ? "#ef4444" : "#10b981", fontWeight: "600" }}>
+        <span
+          style={{
+            color: trend.startsWith("-") ? "#ef4444" : "#10b981",
+            fontWeight: "600",
+          }}
+        >
           {trend}
         </span>
         <span style={{ color: "#64748b", fontSize: "14px" }}>{trendText}</span>
       </div>
-      <p style={{ color: "#475569", margin: "8px 0 0 0", fontSize: "14px" }}>{title}</p>
+      <p style={{ color: "#475569", margin: "8px 0 0 0", fontSize: "14px" }}>
+        {title}
+      </p>
     </div>
   );
 }
@@ -334,10 +378,14 @@ function LeadRow({ name, phone, status, source }) {
 
   return (
     <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-      <td style={tableCell}><strong>{name}</strong></td>
+      <td style={tableCell}>
+        <strong>{name}</strong>
+      </td>
       <td style={tableCell}>{phone}</td>
       <td style={tableCell}>
-        <span style={{ ...statusBadge, ...getStatusStyle(status) }}>{status}</span>
+        <span style={{ ...statusBadge, ...getStatusStyle(status) }}>
+          {status}
+        </span>
       </td>
       <td style={tableCell}>{source}</td>
       <td style={tableCell}>

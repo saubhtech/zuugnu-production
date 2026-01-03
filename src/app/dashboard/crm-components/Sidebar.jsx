@@ -4,6 +4,7 @@
 export default function Sidebar({ active, onChange }) {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: "📊" },
+    { id: "settings", label: "Settings", icon: "⚙️" },
     { id: "career-choice", label: "Career Choice", icon: "🎯" },
     // { id: "leads", label: "Leads", icon: "👥" },
     // { id: "campaigns", label: "Campaigns", icon: "📣" },
@@ -12,7 +13,7 @@ export default function Sidebar({ active, onChange }) {
     // { id: "analytics", label: "Analytics", icon: "📈" },
     // { id: "templates", label: "Templates", icon: "📄" },
     // { id: "automation", label: "Automation", icon: "🤖" },
-    { id: "settings", label: "Settings", icon: "⚙️" },
+   
   ];
 
   return (
