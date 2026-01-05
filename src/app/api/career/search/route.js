@@ -13,49 +13,58 @@ export async function POST(req) {
 
     let careersResult;
 
-    // 1️⃣ Fetch careers
+    // If no filters, return all careers
     if (!filters || Object.keys(filters).length === 0) {
       careersResult = await pool.query(`
         SELECT 
-          career_id,
-          careercode,
-          career,
-          details
-        FROM public.career
-        ORDER BY career
-        LIMIT 1000
+          c.career_id, 
+          c.careercode, 
+          c.career, 
+          c.details,
+          AVG(cd.importance) as avg_importance
+        FROM public.career c
+        LEFT JOIN public.career_data cd ON c.careercode = cd.careercode
+        GROUP BY c.career_id, c.careercode, c.career, c.details
+        ORDER BY avg_importance DESC NULLS LAST
+        LIMIT 100
       `);
     } else {
+      // Get all mast_ids from filters
       const mastIds = Object.values(filters).flat();
+      console.log("📊 Searching for mast_ids:", mastIds);
 
-      careersResult = await pool.query(
-        `
+      // Sort by MAX importance (highest first)
+      careersResult = await pool.query(`
         SELECT 
-          c.career_id,
-          c.careercode,
-          c.career,
-          c.details
+          c.career_id, 
+          c.careercode, 
+          c.career, 
+          c.details,
+          MAX(cd.importance) as max_importance
         FROM public.career c
         JOIN public.career_data cd ON c.careercode = cd.careercode
         WHERE cd.mast_id = ANY($1)
         GROUP BY c.career_id, c.careercode, c.career, c.details
-        ORDER BY MAX(cd.importance) DESC, c.career
-        LIMIT 1000
-        `,
-        [mastIds]
+        ORDER BY max_importance DESC, c.career
+        LIMIT 100
+      `, [mastIds]);
+
+      // ✅ DEBUG LOG
+      console.log("📊 First 5 with importance:", 
+        careersResult.rows.slice(0, 5).map(c => `${c.career} (${c.max_importance})`)
       );
     }
 
     const careers = careersResult.rows;
+
     if (careers.length === 0) {
       return NextResponse.json({ success: true, careers: [], count: 0 });
     }
 
-    // 2️⃣ Fetch ALL attributes in ONE query
+    // Get attributes for all careers in ONE query
     const careerCodes = careers.map((c) => c.careercode);
 
-    const attrsResult = await pool.query(
-      `
+    const attrsResult = await pool.query(`
       SELECT
         cd.careercode,
         cc.career_choice,
@@ -65,15 +74,13 @@ export async function POST(req) {
       JOIN public.career_mast cm ON cd.mast_id = cm.mast_id
       JOIN public.career_choice cc ON cm.choice_id = cc.choice_id
       WHERE cd.careercode = ANY($1)
-      ORDER BY cd.importance DESC, cc.choice_id
-      `,
-      [careerCodes]
-    );
+      ORDER BY cd.careercode, cc.choice_id, cd.importance DESC
+    `, [careerCodes]);
 
-    // 3️⃣ Build attribute map (same structure as before)
+    // Group attributes by career
     const attrByCareer = {};
 
-    for (const row of attrsResult.rows) {
+    attrsResult.rows.forEach((row) => {
       if (!attrByCareer[row.careercode]) {
         attrByCareer[row.careercode] = {};
       }
@@ -86,26 +93,24 @@ export async function POST(req) {
         option: row.option,
         importance: row.importance,
       });
-    }
-
-    // 4️⃣ Attach attributes (NO functionality loss)
-    const finalCareers = careers.map((c) => {
-      const attrs = attrByCareer[c.careercode] || {};
-
-      return {
-        id: c.career_id,
-        careercode: c.careercode,
-        name: c.career,
-        details: c.details,
-        ability: attrs["Career Ability"] || [],
-        activity: attrs["Career Activity"] || [],
-        knowledge: attrs["Career Knowledge"] || [],
-        preference: attrs["Career Preference"] || [],
-        skills: attrs["Career Skills"] || [],
-        technology: attrs["Career Technology"] || [],
-        traits: attrs["Career Traits"] || [],
-      };
     });
+
+    // Build final career objects
+    const finalCareers = careers.map((c) => ({
+      id: c.career_id,
+      careercode: c.careercode,
+      name: c.career,
+      details: c.details,
+      ability: attrByCareer[c.careercode]?.["Career Ability"] || [],
+      activity: attrByCareer[c.careercode]?.["Career Activity"] || [],
+      knowledge: attrByCareer[c.careercode]?.["Career Knowledge"] || [],
+      preference: attrByCareer[c.careercode]?.["Career Preference"] || [],
+      skills: attrByCareer[c.careercode]?.["Career Skills"] || [],
+      technology: attrByCareer[c.careercode]?.["Career Technology"] || [],
+      traits: attrByCareer[c.careercode]?.["Career Traits"] || [],
+    }));
+
+    console.log("✅ Returning", finalCareers.length, "careers");
 
     return NextResponse.json({
       success: true,
