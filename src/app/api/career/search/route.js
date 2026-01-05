@@ -16,25 +16,32 @@ export async function POST(req) {
     // If no filters, return all careers
     if (!filters || Object.keys(filters).length === 0) {
       careersResult = await pool.query(`
-        SELECT 
-          c.career_id, 
-          c.careercode, 
-          c.career, 
-          c.details,
-          AVG(cd.importance) as avg_importance
-        FROM public.career c
-        LEFT JOIN public.career_data cd ON c.careercode = cd.careercode
-        GROUP BY c.career_id, c.careercode, c.career, c.details
-        ORDER BY avg_importance DESC NULLS LAST
-        LIMIT 100
-      `);
+    SELECT 
+      c.career_id, 
+      c.careercode, 
+      c.career, 
+      c.details,
+      MAX(cd.importance) AS max_importance
+    FROM public.career c
+    LEFT JOIN public.career_data cd 
+      ON c.careercode = cd.careercode
+    GROUP BY 
+      c.career_id, 
+      c.careercode, 
+      c.career, 
+      c.details
+    ORDER BY 
+      max_importance DESC NULLS LAST
+    LIMIT 100
+  `);
     } else {
       // Get all mast_ids from filters
       const mastIds = Object.values(filters).flat();
       console.log("📊 Searching for mast_ids:", mastIds);
 
       // Sort by MAX importance (highest first)
-      careersResult = await pool.query(`
+      careersResult = await pool.query(
+        `
         SELECT 
           c.career_id, 
           c.careercode, 
@@ -45,13 +52,18 @@ export async function POST(req) {
         JOIN public.career_data cd ON c.careercode = cd.careercode
         WHERE cd.mast_id = ANY($1)
         GROUP BY c.career_id, c.careercode, c.career, c.details
-        ORDER BY max_importance DESC, c.career
+        ORDER BY max_importance DESC
         LIMIT 100
-      `, [mastIds]);
+      `,
+        [mastIds]
+      );
 
       // ✅ DEBUG LOG
-      console.log("📊 First 5 with importance:", 
-        careersResult.rows.slice(0, 5).map(c => `${c.career} (${c.max_importance})`)
+      console.log(
+        "📊 First 5 with importance:",
+        careersResult.rows
+          .slice(0, 5)
+          .map((c) => `${c.career} (${c.max_importance})`)
       );
     }
 
@@ -64,7 +76,8 @@ export async function POST(req) {
     // Get attributes for all careers in ONE query
     const careerCodes = careers.map((c) => c.careercode);
 
-    const attrsResult = await pool.query(`
+    const attrsResult = await pool.query(
+      `
       SELECT
         cd.careercode,
         cc.career_choice,
@@ -75,7 +88,9 @@ export async function POST(req) {
       JOIN public.career_choice cc ON cm.choice_id = cc.choice_id
       WHERE cd.careercode = ANY($1)
       ORDER BY cd.careercode, cc.choice_id, cd.importance DESC
-    `, [careerCodes]);
+    `,
+      [careerCodes]
+    );
 
     // Group attributes by career
     const attrByCareer = {};
