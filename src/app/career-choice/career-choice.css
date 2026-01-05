@@ -157,7 +157,7 @@
   font-weight: 600;
   color: #667eea;
   position: relative;
-  cursor: help;
+  cursor: pointer;
 }
 
 .occupation-name:hover::after {

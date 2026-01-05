@@ -273,68 +273,118 @@ export default function CareerChoicePage() {
                   <td>
                     <span
                       className="graph-icon clickable"
-                      onClick={() => openAbilityGraph(career)}
-                    >
-                      📊
-                    </span>
-                  </td>
-
-                  <td>
-                    <span
-                      className="graph-icon"
-                      title={career.activity
-                        .map((a) => `${a.option} (${a.importance})`)
-                        .join(", ")}
-                    >
-                      📊
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className="graph-icon"
-                      title={career.knowledge
-                        .map((a) => `${a.option} (${a.importance})`)
-                        .join(", ")}
+                      onClick={() => {
+                        const filtered = career.ability.filter(
+                          (a) => a.importance > 30
+                        );
+                        if (filtered.length === 0)
+                          return alert("No data above 30");
+                        setGraphTitle(career.name + " – Abilities");
+                        setGraphData(filtered);
+                        setShowGraph(true);
+                      }}
                     >
                       📊
                     </span>
                   </td>
                   <td>
                     <span
-                      className="graph-icon"
-                      title={career.preference
-                        .map((a) => `${a.option} (${a.importance})`)
-                        .join(", ")}
+                      className="graph-icon clickable"
+                      onClick={() => {
+                        const filtered = career.activity.filter(
+                          (a) => a.importance > 30
+                        );
+                        if (filtered.length === 0)
+                          return alert("No data above 30");
+                        setGraphTitle(career.name + " – Activities");
+                        setGraphData(filtered);
+                        setShowGraph(true);
+                      }}
                     >
                       📊
                     </span>
                   </td>
                   <td>
                     <span
-                      className="graph-icon"
-                      title={career.skills
-                        .map((a) => `${a.option} (${a.importance})`)
-                        .join(", ")}
+                      className="graph-icon clickable"
+                      onClick={() => {
+                        const filtered = career.knowledge.filter(
+                          (a) => a.importance > 30
+                        );
+                        if (filtered.length === 0)
+                          return alert("No data above 30");
+                        setGraphTitle(career.name + " – Knowledge");
+                        setGraphData(filtered);
+                        setShowGraph(true);
+                      }}
                     >
                       📊
                     </span>
                   </td>
                   <td>
                     <span
-                      className="graph-icon"
-                      title={career.technology
-                        .map((a) => `${a.option} (${a.importance})`)
-                        .join(", ")}
+                      className="graph-icon clickable"
+                      onClick={() => {
+                        const filtered = career.preference.filter(
+                          (a) => a.importance > 30
+                        );
+                        if (filtered.length === 0)
+                          return alert("No data above 30");
+                        setGraphTitle(career.name + " – Preference");
+                        setGraphData(filtered);
+                        setShowGraph(true);
+                      }}
                     >
                       📊
                     </span>
                   </td>
                   <td>
                     <span
-                      className="graph-icon"
-                      title={career.traits
-                        .map((a) => `${a.option} (${a.importance})`)
-                        .join(", ")}
+                      className="graph-icon clickable"
+                      onClick={() => {
+                        const filtered = career.skills.filter(
+                          (a) => a.importance > 30
+                        );
+                        if (filtered.length === 0)
+                          return alert("No data above 30");
+                        setGraphTitle(career.name + " – Skills");
+                        setGraphData(filtered);
+                        setShowGraph(true);
+                      }}
+                    >
+                      📊
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className="graph-icon clickable"
+                      onClick={() => {
+                        const filtered = career.technology.filter(
+                          (a) => a.importance > 30
+                        );
+                        if (filtered.length === 0)
+                          return alert("No data above 30");
+                        setGraphTitle(career.name + " – Technology");
+                        setGraphData(filtered);
+                        setShowGraph(true);
+                      }}
+                    >
+                      📊
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className="graph-icon clickable"
+                      onClick={() => {
+                        const filtered = career.traits.filter(
+                          (a) => a.importance > 30
+                        );
+                        if (filtered.length === 0)
+                          return alert("No data above 30");
+                        setGraphTitle(career.name + " – Traits");
+                        setGraphData(filtered);
+                        setShowGraph(true);
+                      }}
                     >
                       📊
                     </span>
