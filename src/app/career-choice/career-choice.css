@@ -156,6 +156,25 @@
 .occupation-name {
   font-weight: 600;
   color: #667eea;
+  position: relative;
+  cursor: help;
+}
+
+.occupation-name:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: normal;
+  width: 300px;
+  z-index: 1000;
+  font-size: 12px;
+  font-weight: normal;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
 .graph-icon {

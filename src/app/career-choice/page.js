@@ -61,59 +61,62 @@ export default function CareerChoicePage() {
     loadFilters();
   }, [router]);
 
- const loadFilters = async () => {
-  try {
-    const response = await fetch("/api/career/filters");
-    const data = await response.json();
+  const loadFilters = async () => {
+    try {
+      const response = await fetch("/api/career/filters");
+      const data = await response.json();
 
-    console.log("📦 API Response:", data); // DEBUG
-    console.log("📋 Filter Options:", data.filters); // DEBUG
-    console.log("📊 Filter Count:", Object.keys(data.filters || {}).length); // DEBUG
+      console.log("📦 API Response:", data); // DEBUG
+      console.log("📋 Filter Options:", data.filters); // DEBUG
+      console.log("📊 Filter Count:", Object.keys(data.filters || {}).length); // DEBUG
 
-    if (data.success) {
-      setFilterOptions(data.filters);
+      if (data.success) {
+        setFilterOptions(data.filters);
+      }
+    } catch (error) {
+      console.error("Failed to load filters:", error);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Failed to load filters:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleSearch = async () => {
-  setSearching(true);
-  setCurrentPage(1);
+    setSearching(true);
+    setCurrentPage(1);
 
-  try {
-    const cleanedFilters = Object.entries(selectedFilters).reduce(
-      (acc, [key, value]) => {
-        if (value && value.length > 0 && value[0] !== null) {
-          acc[key] = value;
-        }
-        return acc;
-      },
-      {}
-    );
+    try {
+      const cleanedFilters = Object.entries(selectedFilters).reduce(
+        (acc, [key, value]) => {
+          if (value && value.length > 0 && value[0] !== null) {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {}
+      );
 
-    const response = await fetch("/api/career/search", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filters: cleanedFilters }),
-    });
+      const response = await fetch("/api/career/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filters: cleanedFilters }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (data.success) {
-      // ✅ DEBUG: Log first 10 careers to see order
-      console.log("📋 First 10 careers from API:", data.careers.slice(0, 10).map(c => c.name));
-      setCareers(data.careers);
+      if (data.success) {
+        // ✅ DEBUG: Log first 10 careers to see order
+        console.log(
+          "📋 First 10 careers from API:",
+          data.careers.slice(0, 10).map((c) => c.name)
+        );
+        setCareers(data.careers);
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+    } finally {
+      setSearching(false);
     }
-  } catch (error) {
-    console.error("Search failed:", error);
-  } finally {
-    setSearching(false);
-  }
-};
+  };
 
   const handleReset = () => {
     setSelectedFilters({});
@@ -264,7 +267,9 @@ export default function CareerChoicePage() {
             ) : (
               displayedCareers.map((career) => (
                 <tr key={career.id}>
-                  <td className="occupation-name">{career.name}</td>
+                  <td className="occupation-name" title={career.details}>
+                    {career.name}
+                  </td>
                   <td>
                     <span
                       className="graph-icon clickable"
