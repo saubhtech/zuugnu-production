@@ -104,7 +104,7 @@ export default function CareerChoicePage() {
       const data = await response.json();
 
       if (data.success) {
-        // ✅ DEBUG: Log first 10 careers to see order
+        console.log("🔍 First career:", data.careers[0]); // <-- ADD THIS LINE
         console.log(
           "📋 First 10 careers from API:",
           data.careers.slice(0, 10).map((c) => c.name)

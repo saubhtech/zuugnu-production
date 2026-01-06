@@ -13,33 +13,30 @@ export async function POST(req) {
 
     let careersResult;
 
-    // If no filters, return all careers
     if (!filters || Object.keys(filters).length === 0) {
       careersResult = await pool.query(`
-    SELECT 
-      c.career_id, 
-      c.careercode, 
-      c.career, 
-      c.details,
-      MAX(cd.importance) AS max_importance
-    FROM public.career c
-    LEFT JOIN public.career_data cd 
-      ON c.careercode = cd.careercode
-    GROUP BY 
-      c.career_id, 
-      c.careercode, 
-      c.career, 
-      c.details
-    ORDER BY 
-      max_importance DESC NULLS LAST
-    LIMIT 100
-  `);
+        SELECT 
+          c.career_id, 
+          c.careercode, 
+          c.career, 
+          c.details,
+          MAX(cd.importance) AS max_importance
+        FROM public.career c
+        LEFT JOIN public.career_data cd 
+          ON c.careercode = cd.careercode
+        GROUP BY 
+          c.career_id, 
+          c.careercode, 
+          c.career, 
+          c.details
+        ORDER BY 
+          max_importance DESC NULLS LAST
+        LIMIT 100
+      `);
     } else {
-      // Get all mast_ids from filters
       const mastIds = Object.values(filters).flat();
       console.log("📊 Searching for mast_ids:", mastIds);
 
-      // Sort by MAX importance (highest first)
       careersResult = await pool.query(
         `
         SELECT 
@@ -57,14 +54,6 @@ export async function POST(req) {
       `,
         [mastIds]
       );
-
-      // ✅ DEBUG LOG
-      console.log(
-        "📊 First 5 with importance:",
-        careersResult.rows
-          .slice(0, 5)
-          .map((c) => `${c.career} (${c.max_importance})`)
-      );
     }
 
     const careers = careersResult.rows;
@@ -73,7 +62,6 @@ export async function POST(req) {
       return NextResponse.json({ success: true, careers: [], count: 0 });
     }
 
-    // Get attributes for all careers in ONE query
     const careerCodes = careers.map((c) => c.careercode);
 
     const attrsResult = await pool.query(
@@ -92,7 +80,6 @@ export async function POST(req) {
       [careerCodes]
     );
 
-    // Group attributes by career
     const attrByCareer = {};
 
     attrsResult.rows.forEach((row) => {
@@ -110,7 +97,6 @@ export async function POST(req) {
       });
     });
 
-    // Build final career objects
     const finalCareers = careers.map((c) => ({
       id: c.career_id,
       careercode: c.careercode,
@@ -118,11 +104,18 @@ export async function POST(req) {
       details: c.details,
       ability: attrByCareer[c.careercode]?.["Career Ability"] || [],
       activity: attrByCareer[c.careercode]?.["Career Activity"] || [],
+      industry: attrByCareer[c.careercode]?.["Career Industry"] || [],
+      interest: attrByCareer[c.careercode]?.["Career Interest"] || [],
       knowledge: attrByCareer[c.careercode]?.["Career Knowledge"] || [],
+      outlook: attrByCareer[c.careercode]?.["Career Outlook"] || [],
+      pathway: attrByCareer[c.careercode]?.["Career Pathway"] || [],
       preference: attrByCareer[c.careercode]?.["Career Preference"] || [],
+      sector: attrByCareer[c.careercode]?.["Career Sector"] || [],
       skills: attrByCareer[c.careercode]?.["Career Skills"] || [],
+      stem: attrByCareer[c.careercode]?.["Career STEM"] || [],
       technology: attrByCareer[c.careercode]?.["Career Technology"] || [],
       traits: attrByCareer[c.careercode]?.["Career Traits"] || [],
+      zone: attrByCareer[c.careercode]?.["Career Zone"] || [],
     }));
 
     console.log("✅ Returning", finalCareers.length, "careers");
