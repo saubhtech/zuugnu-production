@@ -356,22 +356,33 @@ export default function CareerChoicePage() {
                     </span>
                   </td>
                   <td>
-                    <span
-                      className="graph-icon clickable"
-                      onClick={() => {
-                        const filtered = career.technology.filter(
-                          (a) => a.importance > 30
-                        );
-                        if (filtered.length === 0)
-                          return alert("No data above 30");
-                        setGraphTitle(career.name + " – Technology");
-                        setGraphData(filtered);
-                        setShowGraph(true);
-                      }}
-                    >
-                      📊
-                    </span>
-                  </td>
+  <span
+    className="graph-icon clickable"
+    onClick={() => {
+      console.log("🔍 Technology data:", career.technology); // DEBUG
+      
+      if (!career.technology || career.technology.length === 0) {
+        return alert("No technology data available");
+      }
+      
+      const filtered = career.technology.filter(
+        (a) => a.importance > 0  // Changed from 30 to 0
+      );
+      
+      console.log("📊 Filtered technology:", filtered); // DEBUG
+      
+      if (filtered.length === 0) {
+        return alert("No technology data with importance > 0");
+      }
+      
+      setGraphTitle(career.name + " – Technology");
+      setGraphData(filtered);
+      setShowGraph(true);
+    }}
+  >
+    📊
+  </span>
+</td>
                   <td>
                     <span
                       className="graph-icon clickable"
