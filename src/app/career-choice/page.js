@@ -356,33 +356,38 @@ export default function CareerChoicePage() {
                     </span>
                   </td>
                   <td>
-  <span
-    className="graph-icon clickable"
-    onClick={() => {
-      console.log("🔍 Technology data:", career.technology); // DEBUG
-      
-      if (!career.technology || career.technology.length === 0) {
-        return alert("No technology data available");
-      }
-      
-      const filtered = career.technology.filter(
-        (a) => a.importance > 0  // Changed from 30 to 0
-      );
-      
-      console.log("📊 Filtered technology:", filtered); // DEBUG
-      
-      if (filtered.length === 0) {
-        return alert("No technology data with importance > 0");
-      }
-      
-      setGraphTitle(career.name + " – Technology");
-      setGraphData(filtered);
-      setShowGraph(true);
-    }}
-  >
-    📊
-  </span>
-</td>
+                    <span
+                      className="graph-icon clickable"
+                      onClick={() => {
+                        console.log("🔍 Technology data:", career.technology); // DEBUG
+
+                        if (
+                          !career.technology ||
+                          career.technology.length === 0
+                        ) {
+                          return alert("No technology data available");
+                        }
+
+                        const filtered = career.technology.filter(
+                          (a) => a.importance > 0 // Changed from 30 to 0
+                        );
+
+                        console.log("📊 Filtered technology:", filtered); // DEBUG
+
+                        if (filtered.length === 0) {
+                          return alert(
+                            "No technology data with importance > 0"
+                          );
+                        }
+
+                        setGraphTitle(career.name + " – Technology");
+                        setGraphData(filtered);
+                        setShowGraph(true);
+                      }}
+                    >
+                      📊
+                    </span>
+                  </td>
                   <td>
                     <span
                       className="graph-icon clickable"
@@ -444,8 +449,18 @@ export default function CareerChoicePage() {
       {showGraph && (
         <div className="graph-modal-overlay">
           <div className="graph-modal">
+            {/* TOP CLOSE ICON */}
+            <button
+              className="graph-close-icon"
+              onClick={() => setShowGraph(false)}
+              aria-label="Close graph"
+            >
+              ×
+            </button>
+
             <div className="graph-modal-header">
               <h2>{graphTitle}</h2>
+              <p className="graph-subtitle">Importance distribution (0–100)</p>
             </div>
 
             <div className="graph-bars">
@@ -460,12 +475,13 @@ export default function CareerChoicePage() {
                 return (
                   <div key={idx} className="bar-row">
                     <span className="bar-label">{item.option}</span>
+
                     <div className="bar" style={{ height: barHeight }}>
                       <div
                         className="bar-fill"
                         style={{ width: `${item.importance}%` }}
                       >
-                        {item.importance}
+                        {item.importance}%
                       </div>
                     </div>
                   </div>
@@ -473,7 +489,6 @@ export default function CareerChoicePage() {
               })}
             </div>
 
-            {/* 👇 CLOSE BUTTON ALWAYS VISIBLE AFTER SCROLL */}
             <div className="graph-modal-footer">
               <button className="close-btn" onClick={() => setShowGraph(false)}>
                 Close
