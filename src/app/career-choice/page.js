@@ -359,29 +359,34 @@ export default function CareerChoicePage() {
                     <span
                       className="graph-icon clickable"
                       onClick={() => {
+                        console.log("🔍 Full career object:", career); // DEBUG
                         console.log("🔍 Technology data:", career.technology); // DEBUG
 
                         if (
                           !career.technology ||
                           career.technology.length === 0
                         ) {
-                          return alert("No technology data available");
-                        }
-
-                        const filtered = career.technology.filter(
-                          (a) => a.importance > 0 // Changed from 30 to 0
-                        );
-
-                        console.log("📊 Filtered technology:", filtered); // DEBUG
-
-                        if (filtered.length === 0) {
                           return alert(
-                            "No technology data with importance > 0"
+                            "No technology data available for this career"
                           );
                         }
 
-                        setGraphTitle(career.name + " – Technology");
-                        setGraphData(filtered);
+                        // ✅ Sort by importance and show top items
+                        const sorted = [...career.technology].sort(
+                          (a, b) => b.importance - a.importance
+                        );
+
+                        // ✅ Show top 20 or all if less than 20
+                        const topTech = sorted.slice(0, 20);
+
+                        if (topTech.length === 0) {
+                          return alert("No technology data available");
+                        }
+
+                        setGraphTitle(
+                          `${career.name} – Technology (Top ${topTech.length})`
+                        );
+                        setGraphData(topTech);
                         setShowGraph(true);
                       }}
                     >
