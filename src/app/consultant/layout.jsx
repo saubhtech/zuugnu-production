@@ -1,77 +1,53 @@
 "use client";
+import { useRouter, useSearchParams } from "next/navigation";
 import "./consultant.css";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function ConsultantLayout({ children }) {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const tab = useSearchParams().get("tab") || "dashboard";
 
-  useEffect(() => {
-    const stored = localStorage.getItem("authUser");
-    if (!stored) return router.push("/login");
-    setUser(JSON.parse(stored));
-  }, [router]);
-
-  if (!user) return <>Loading...</>;
+  const go = t => router.push(`/consultant?tab=${t}`);
 
   return (
-    <div className="consultant-root">
+    <>
+      {/* HEADER */}
+      <div className="consult-header">
+        <span>Consultant Workspace</span>
 
-      {/* Global Top Portal Bar */}
-      <nav className="portal-navbar">
-        <div className="navbar-left">
-          <div className="brand-name">UGC SMA Platform</div>
-          <div className="portal-switch">
-            <button>Admin</button>
-            <button>Client</button>
-            <button className="active">Consultant</button>
-            <button>Creator</button>
-          </div>
+        <div className="ch-right">
+          <span className="avatar-pill">SC</span>
+          <span>Sarah Chen</span>
         </div>
+      </div>
 
-        <div className="navbar-right">
-          <div className="bell">🔔</div>
-          <div className="avatar-badge">{user.name?.charAt(0) || "C"}</div>
-          <span className="user-role">{user.name}</span>
-        </div>
-      </nav>
+      {/* LAYOUT */}
+      <div className="consult-layout">
 
-      <div className="workspace">
+        {/* SIDEBAR */}
+        <aside className="consult-sidebar">
+          <div className="sidebar-title">UGC SMA Platform</div>
+          <div className="sidebar-sub">Consultant Portal</div>
 
-        {/* Sidebar */}
-        <aside className="consultant-sidebar">
-
-          <div className="sidebar-header">
-            <div className="sidebar-title">Consultant Portal</div>
-            <div className="sidebar-subtitle">Manage Projects & Teams</div>
+          <div className="nav-menu">
+            <div className={`nav-item ${tab==="dashboard"?"active":""}`} onClick={()=>go("dashboard")}>Dashboard</div>
+            <div className={`nav-item ${tab==="marketplace"?"active":""}`} onClick={()=>go("marketplace")}>Marketplace</div>
+            <div className={`nav-item ${tab==="active"?"active":""}`} onClick={()=>go("active")}>Active Assignments</div>
+            <div className={`nav-item ${tab==="review"?"active":""}`} onClick={()=>go("review")}>Review & Approvals</div>
+            <div className={`nav-item ${tab==="creators"?"active":""}`} onClick={()=>go("creators")}>Creators</div>
+            <div className={`nav-item ${tab==="analytics"?"active":""}`} onClick={()=>go("analytics")}>Analytics</div>
+            <div className={`nav-item ${tab==="earnings"?"active":""}`} onClick={()=>go("earnings")}>Escrow & Earnings</div>
+            <div className={`nav-item ${tab==="projects"?"active":""}`} onClick={()=>go("projects")}>Projects</div>
+            <div className={`nav-item ${tab==="bids"?"active":""}`} onClick={()=>go("bids")}>My Bids</div>
+            <div className={`nav-item ${tab==="profile"?"active":""}`} onClick={()=>go("profile")}>Profile</div>
           </div>
-
-          <a href="/consultant/dashboard" className="sidebar-link active">📊 Dashboard</a>
-          <a href="/consultant/projects" className="sidebar-link">🛒 Project Marketplace</a>
-          <a href="/consultant/bids" className="sidebar-link">📁 My Bids</a>
-          <a href="/consultant/active-projects" className="sidebar-link">📂 Active Projects</a>
-          <a href="/consultant/creators" className="sidebar-link">👥 Manage Creators</a>
-          <a href="/consultant/earnings" className="sidebar-link">💰 Earnings & Escrow</a>
-          <a href="/consultant/profile" className="sidebar-link">👤 Profile</a>
-
-          <button 
-            className="logout-btn"
-            onClick={() => {
-              localStorage.removeItem("authUser");
-              router.push("/login");
-            }}
-          >
-            Logout
-          </button>
         </aside>
 
-        {/* Main */}
-        <main className="consultant-content">
+        {/* MAIN CONTENT */}
+        <main className="consult-content">
           {children}
         </main>
 
       </div>
-    </div>
+    </>
   );
 }
