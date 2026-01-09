@@ -1,13 +1,15 @@
 "use client";
 
-
 export default function PerformanceTab() {
   return (
     <div className="creator-tab-wrap">
+
+      {/* PAGE HEADER */}
       <h1 className="page-title">Performance Analytics</h1>
       <p className="page-sub">Approval rates, completion stats & payout efficiency</p>
 
-      <div className="stat-grid">
+      {/* STATS ROW */}
+      <div className="stat-grid mt20">
         <div className="perf-card">
           <small>Total Submissions</small>
           <h2>48</h2>
@@ -33,14 +35,58 @@ export default function PerformanceTab() {
         </div>
       </div>
 
-      <div className="panel big mt20">
-        <h3>Submission Trend</h3>
-        <div className="chart-placeholder big" />
+      {/* SUBMISSION TREND + CONTENT FORMAT GRID */}
+      <div className="grid-2 mt30">
+
+        {/* LINE GRAPH */}
+        <div className="panel big">
+          <div className="panel-header">
+            <h3>Submission Trend</h3>
+          </div>
+          <div className="chart-placeholder-line">
+            📈 Line Graph Loading...
+          </div>
+        </div>
+
+        {/* PIE / DONUT CHART */}
+        <div className="panel big">
+          <div className="panel-header">
+            <h3>Content Format Performance</h3>
+          </div>
+          <div className="chart-placeholder-donut">
+            🍩 Pie Chart Loading...
+          </div>
+
+        </div>
       </div>
 
-      <div className="panel big">
-        <h3>Content Format Performance</h3>
-        <div className="chart-placeholder big" />
+      {/* FEEDBACK SECTION */}
+      <div className="panel big mt30">
+        <div className="panel-header">
+          <h3>Feedback from Consultants</h3>
+        </div>
+
+        <div className="feedback-item positive">
+          <div className="feedback-icon blue">📝</div>
+          <div className="feedback-main">
+            <p className="fb-text">“Excellent work on the Nike Reel, clean brand fit”</p>
+            <small className="muted">
+              John Smith (Consultant) • Project: Nike Summer Campaign
+            </small>
+          </div>
+          <span className="fb-tag green">Positive</span>
+        </div>
+
+        <div className="feedback-item warn">
+          <div className="feedback-icon yellow">⚠️</div>
+          <div className="feedback-main">
+            <p className="fb-text">“Adjust the color palette slightly for brand consistency”</p>
+            <small className="muted">
+              Sarah Lee (Consultant) • Project: Eco-Friendly Fashion
+            </small>
+          </div>
+          <span className="fb-tag orange">Revision</span>
+        </div>
       </div>
     </div>
   );
