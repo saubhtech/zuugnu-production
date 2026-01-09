@@ -2,42 +2,93 @@
 
 export default function MarketplaceTab() {
   return (
-    <div>
-      <h1 className="page-title">Marketplace</h1>
-      <p className="page-sub">Match brands with verified creators</p>
+    <div className="market-container">
+      
+      <h1 className="market-title">Project Marketplace</h1>
+      <p className="market-sub">Browse and bid on available projects</p>
 
-      <div className="filter-bar">
-        <input placeholder="Search campaigns..." className="filter-input" />
-        <select className="filter-select">
-          <option>All Categories</option>
-          <option>Fashion</option>
-          <option>Gaming</option>
-          <option>Health & Wellness</option>
-        </select>
-        <select className="filter-select">
-          <option>All Platforms</option>
-          <option>Instagram</option>
-          <option>TikTok</option>
-          <option>YouTube</option>
-        </select>
-        <button className="gray-btn">Filter</button>
-      </div>
+      {/* ===== Project Grid ===== */}
+      <div className="market-grid">
 
-      <div className="market-card">
-        <h3>Nike Summer Campaign</h3>
-        <p className="muted">Reels + Youtube Review + UGC Clips</p>
-        <div className="row-between">
-          <span><b>Budget:</b> $8,500</span>
-          <button className="btn-primary">Assign Creators</button>
+        {/* CARD 1 */}
+        <div className="market-card-lg">
+          <div className="card-head purple-grad">
+            <div>
+              <h3>Adidas Brand Awareness Campaign</h3>
+              <small>Posted 2 hours ago</small>
+            </div>
+            <span className="pill">New</span>
+          </div>
+
+          <div className="card-meta">
+            <div>
+              <small>Budget</small>
+              <p>$8,500</p>
+            </div>
+            <div>
+              <small>Duration</small>
+              <p>45 days</p>
+            </div>
+            <div>
+              <small>Bids</small>
+              <p>3</p>
+            </div>
+          </div>
+
+          <p className="card-desc">
+            Need 50+ social media posts, 10 articles, and 20+ Google reviews 
+            for new product line launch.
+          </p>
+
+          <div className="tag-row">
+            <span className="tag">Instagram</span>
+            <span className="tag">YouTube</span>
+            <span className="tag">Google Reviews</span>
+          </div>
+
+          <button className="proposal-btn">
+            Submit Proposal
+          </button>
         </div>
-      </div>
 
-      <div className="market-card">
-        <h3>Sephora Beauty Collab</h3>
-        <p className="muted">Instagram UGC + Testimonials</p>
-        <div className="row-between">
-          <span><b>Budget:</b> $12,000</span>
-          <button className="btn-primary">Assign Creators</button>
+        {/* CARD 2 */}
+        <div className="market-card-lg">
+          <div className="card-head green-grad">
+            <div>
+              <h3>Eco-Friendly Product Launch Campaign</h3>
+              <small>Posted 1 day ago</small>
+            </div>
+          </div>
+
+          <div className="card-meta">
+            <div>
+              <small>Budget</small>
+              <p>$4,000</p>
+            </div>
+            <div>
+              <small>Duration</small>
+              <p>25 days</p>
+            </div>
+            <div>
+              <small>Bids</small>
+              <p>1</p>
+            </div>
+          </div>
+
+          <p className="card-desc">
+            Seeking organic content creators for a new sustainable product 
+            line launch on Pinterest and Instagram.
+          </p>
+
+          <div className="tag-row">
+            <span className="tag">Pinterest</span>
+            <span className="tag">Instagram</span>
+            <span className="tag">Blog</span>
+          </div>
+
+          <button className="proposal-btn">
+            Submit Proposal
+          </button>
         </div>
       </div>
     </div>

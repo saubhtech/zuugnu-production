@@ -1,39 +1,79 @@
 "use client";
 
-export default function AnalyticsTab() {
+export default function Creators() {
   return (
-    <div>
-      <h1 className="page-title">Analytics</h1>
-      <p className="page-sub">Insights across performance, engagement & payouts</p>
+    <div className="creators-container">
 
-      <div className="stats-4">
-        <div className="stat-card">
-          <small>Approval Rate</small>
-          <h2>91%</h2>
+      <h1 className="creators-title">Manage Creators</h1>
+      <p className="creators-sub">
+        Your pool of UGC creators and their performance
+      </p>
+
+      <div className="creators-top-row">
+        <div className="search-box">
+          <span className="search-icon">🔍</span>
+          <input placeholder="Search creators..." />
         </div>
-        <div className="stat-card">
-          <small>Completion Rate</small>
-          <h2>97%</h2>
-        </div>
-        <div className="stat-card">
-          <small>Avg. Earnings Per Creator</small>
-          <h2>$1,870</h2>
-        </div>
-        <div className="stat-card">
-          <small>Avg. Campaign Value</small>
-          <h2>$8,400</h2>
-        </div>
+
+        <button className="invite-btn">
+          <span className="invite-icon">👤➕</span>
+          Invite New Creator
+        </button>
       </div>
 
-      <div className="panel big">
-        <h3>Campaign Spend Breakdown</h3>
-        <div className="chart-placeholder big" />
+      <div className="creators-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Creator</th>
+              <th>Specialization</th>
+              <th>Active Tasks</th>
+              <th>Success Rate</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td className="creator-cell">
+                <div className="avatar" />
+                <div>
+                  <b>Sarah Chen</b>
+                  <div className="email">sarah.chen@mail.com</div>
+                </div>
+              </td>
+              <td>Instagram Reels, Posts</td>
+              <td>3</td>
+              <td className="success green">95%</td>
+              <td className="status hired">Hired</td>
+              <td>
+                <span className="action-link">View Profile</span> ·{" "}
+                <span className="action-link remove">Remove</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td className="creator-cell">
+                <div className="avatar" />
+                <div>
+                  <b>David Lee</b>
+                  <div className="email">david.lee@mail.com</div>
+                </div>
+              </td>
+              <td>YouTube Videos, TikTok</td>
+              <td>2</td>
+              <td className="success green">92%</td>
+              <td className="status hired">Hired</td>
+              <td>
+                <span className="action-link">View Profile</span> ·{" "}
+                <span className="action-link remove">Remove</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div className="panel big">
-        <h3>Creator Performance Distribution</h3>
-        <div className="chart-placeholder big" />
-      </div>
     </div>
   );
 }

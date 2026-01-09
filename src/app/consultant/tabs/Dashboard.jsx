@@ -2,56 +2,100 @@
 
 export default function DashboardTab() {
   return (
-    <div>
-      <h1 className="page-title">Consultant Dashboard</h1>
-      <p className="page-sub">Manage campaigns, creators & approvals</p>
+    <div className="dash-container">
+      <h1 className="dash-title">Consultant Dashboard</h1>
+      <p className="dash-sub">Manage projects and creator teams</p>
 
-      {/* Stats */}
-      <div className="stats-4">
+      {/* ===== Stats Row ===== */}
+      <div className="stats-row">
         <div className="stat-card">
-          <small>Active Campaigns</small>
-          <h2>12</h2>
-          <p className="text-mini text-green">+4 new this week</p>
+          <div className="icon purple">📋</div>
+          <small>Active Projects</small>
+          <h2>5</h2>
+          <p className="mini">1 awaiting client approval</p>
         </div>
+
         <div className="stat-card">
-          <small>Creators Assigned</small>
-          <h2>38</h2>
-          <p className="text-mini">Across 12 campaigns</p>
+          <div className="icon green">💵</div>
+          <small>In Escrow</small>
+          <h2 className="green">$18,500</h2>
+          <p className="mini">Ready for release</p>
         </div>
+
         <div className="stat-card">
-          <small>Pending Reviews</small>
-          <h2 className="red">9</h2>
-          <p className="text-mini red">Needs action</p>
+          <div className="icon yellow">📑</div>
+          <small>Pending Bids</small>
+          <h2>3</h2>
+          <p className="mini">Awaiting client review</p>
         </div>
+
         <div className="stat-card">
-          <small>Total Escrow</small>
-          <h2 className="green">$18,200</h2>
-          <p className="text-mini">Managed by you</p>
+          <div className="icon blue">👤</div>
+          <small>My Creators</small>
+          <h2>28</h2>
+          <p className="mini green">25 active</p>
+        </div>
+
+        <div className="stat-card">
+          <div className="icon pink">📈</div>
+          <small>This Month Earnings</small>
+          <h2>$12.4K</h2>
+          <p className="mini green">+10%</p>
         </div>
       </div>
 
-      {/* Panels */}
-      <div className="dash-grid">
+      {/* ===== MAIN GRID (Left + Right) ===== */}
+      <div className="main-grid">
+        
+        {/* LEFT: ACTIVE PROJECTS */}
         <div className="panel">
-          <div className="panel-head">
-            <h3>Active Assignments</h3>
-            <span className="view-link">View All</span>
+          <h3>Active Projects</h3>
+
+          <div className="proj-card">
+            <div className="proj-top">
+              <b>Nike Summer Campaign</b>
+              <span className="badge progress">In Progress</span>
+            </div>
+
+            <div className="proj-details">
+              <div><small>Budget</small><p>$5,000</p></div>
+              <div><small>Creators</small><p>12 assigned</p></div>
+              <div><small>Progress</small><p>65%</p></div>
+              <div><small>Due</small><p>12 days</p></div>
+            </div>
+
+            <div className="progress-bar purple">
+              <div style={{ width: "65%" }} />
+            </div>
           </div>
 
-          <div className="assign-line">
-            <b>Instagram Reel - Nike Air</b>
-            <span className="badge pending">Pending</span>
-          </div>
+          <div className="proj-card">
+            <div className="proj-top">
+              <b>Google Review Blitz for new product</b>
+              <span className="badge progress">In Progress</span>
+            </div>
 
-          <div className="assign-line">
-            <b>Youtube Review - Adidas Boost</b>
-            <span className="badge review">Reviewing</span>
+            <div className="proj-details">
+              <div><small>Budget</small><p>$2,500</p></div>
+              <div><small>Creators</small><p>8 assigned</p></div>
+              <div><small>Progress</small><p>80%</p></div>
+              <div><small>Due</small><p>5 days</p></div>
+            </div>
+
+            <div className="progress-bar blue">
+              <div style={{ width: "80%" }} />
+            </div>
           </div>
         </div>
 
-        <div className="panel">
-          <h3>Performance Trend</h3>
-          <div className="chart-placeholder big" />
+        {/* RIGHT: EARNINGS OVERVIEW */}
+        <div className="panel earnings-panel">
+          <h3>Earnings Overview</h3>
+
+          <div className="earn-chart-placeholder">
+            <p className="chart-label">$14,000</p>
+            {/* This is placeholder; can convert to real chart later */}
+          </div>
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ export default function ConsultantLayout({ children }) {
     <>
       {/* HEADER */}
       <div className="consult-header">
-        <span>Consultant Workspace</span>
+        <span>UGC SMA Platform</span>
 
         <div className="ch-right">
           <span className="avatar-pill">SC</span>
@@ -25,19 +25,33 @@ export default function ConsultantLayout({ children }) {
 
         {/* SIDEBAR */}
         <aside className="consult-sidebar">
-          <div className="sidebar-title">UGC SMA Platform</div>
-          <div className="sidebar-sub">Consultant Portal</div>
+          {/* <div className="sidebar-title">UGC SMA Platform</div>
+          <div className="sidebar-sub">Consultant Portal</div> */}
 
           <div className="nav-menu">
             <div className={`nav-item ${tab==="dashboard"?"active":""}`} onClick={()=>go("dashboard")}>Dashboard</div>
             <div className={`nav-item ${tab==="marketplace"?"active":""}`} onClick={()=>go("marketplace")}>Marketplace</div>
-            <div className={`nav-item ${tab==="active"?"active":""}`} onClick={()=>go("active")}>Active Assignments</div>
-            <div className={`nav-item ${tab==="review"?"active":""}`} onClick={()=>go("review")}>Review & Approvals</div>
-            <div className={`nav-item ${tab==="creators"?"active":""}`} onClick={()=>go("creators")}>Creators</div>
-            <div className={`nav-item ${tab==="analytics"?"active":""}`} onClick={()=>go("analytics")}>Analytics</div>
-            <div className={`nav-item ${tab==="earnings"?"active":""}`} onClick={()=>go("earnings")}>Escrow & Earnings</div>
-            <div className={`nav-item ${tab==="projects"?"active":""}`} onClick={()=>go("projects")}>Projects</div>
             <div className={`nav-item ${tab==="bids"?"active":""}`} onClick={()=>go("bids")}>My Bids</div>
+      <div 
+  className={`nav-item ${tab === "projects" ? "active" : ""}`} 
+  onClick={() => go("projects")}
+>
+  Active Projects
+</div>
+<div 
+  className={`nav-item ${tab === "approvals" ? "active" : ""}`} 
+  onClick={() => go("approvals")}
+>
+  Content Approvals
+</div>
+
+            {/* <div className={`nav-item ${tab==="active"?"active":""}`} onClick={()=>go("active")}>Active Assignments</div>
+            <div className={`nav-item ${tab==="review"?"active":""}`} onClick={()=>go("review")}>Review & Approvals</div> */}
+            <div className={`nav-item ${tab==="creators"?"active":""}`} onClick={()=>go("creators")}>Creators</div>
+            <div className={`nav-item ${tab==="assignments"?"active":""}`} onClick={()=>go("assignments")}>Distribute Assignments</div>
+            <div className={`nav-item ${tab==="earnings"?"active":""}`} onClick={()=>go("earnings")}>Escrow & Earnings</div>
+             <div className={`nav-item ${tab==="analytics"?"active":""}`} onClick={()=>go("analytics")}>Analytics</div>
+            {/* <div className={`nav-item ${tab==="projects"?"active":""}`} onClick={()=>go("projects")}>Projects</div> */}
             <div className={`nav-item ${tab==="profile"?"active":""}`} onClick={()=>go("profile")}>Profile</div>
           </div>
         </aside>

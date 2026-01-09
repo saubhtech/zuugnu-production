@@ -2,18 +2,21 @@
 
 import { useSearchParams } from "next/navigation";
 
+// Tabs
 import Dashboard from "./tabs/Dashboard";
 import Marketplace from "./tabs/Marketplace";
-import Assignments from "./tabs/ActiveAssignments";
-import Approvals from "./tabs/Approvals";
+import MyBids from "./tabs/MyBids";
+import Projects from "./tabs/Projects";                 // Active Projects
+import ContentApprovals from "./tabs/ContentApprovals"; // Consultant Approvals
 import Creators from "./tabs/Creators";
 import Analytics from "./tabs/Analytics";
 import Earnings from "./tabs/Earnings";
 import Profile from "./tabs/Profile";
-import Projects from "./tabs/Projects";
-import MyBids from "./tabs/MyBids";
-// import Messaging from "./tabs/Messaging"; // optional
-// import Notifications from "./tabs/Notifications"; // optional
+import DistributeAssignments from "./tabs/DistributeAssignments";
+
+// Optional future screens
+// import DistributeAssignments from "./tabs/DistributeAssignments";
+// import ReviewApprovals from "./tabs/ReviewApprovals"; // Brand-level review
 
 export default function ConsultantPage() {
   const tab = useSearchParams().get("tab") || "dashboard";
@@ -22,18 +25,18 @@ export default function ConsultantPage() {
     <>
       {tab === "dashboard" && <Dashboard />}
       {tab === "marketplace" && <Marketplace />}
-      {tab === "assignments" && <Assignments />}
-      {tab === "approvals" && <Approvals />}
-      {tab === "creators" && <Creators />}
-      {tab === "analytics" && <Analytics />}
-      {tab === "earnings" && <Earnings />}
-      {tab === "projects" && <Projects />}
       {tab === "bids" && <MyBids />}
+      {tab === "projects" && <Projects />}
+      {tab === "approvals" && <ContentApprovals />}   {/* FIXED */}
+      {tab === "creators" && <Creators />}
+      {tab === "assignments" && <DistributeAssignments />}
+        {tab === "earnings" && <Earnings />}
+      {tab === "analytics" && <Analytics />}
       {tab === "profile" && <Profile />}
 
-      {/* Optional */}
-      {/* {tab === "messaging" && <Messaging />} */}
-      {/* {tab === "notifications" && <Notifications />} */}
+      {/* Optional future flows */}
+      {/* {tab === "review" && <ReviewApprovals />} */}
+      {/* {tab === "assignments" && <DistributeAssignments />} */}
     </>
   );
 }
