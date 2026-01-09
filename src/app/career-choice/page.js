@@ -28,23 +28,42 @@ export default function CareerChoicePage() {
   };
 
   // ✅ Helper to show graph with top data
-  const showTopData = (career, dataKey, title) => {
-    const data = career[dataKey];
-    
-    console.log(`Showing ${title} for ${career.name}:`, data); // Debug log
-    
-    if (!data || data.length === 0) {
-      console.warn(`No data available for ${title} in ${career.name}`);
-      return;
-    }
+ const showTopData = (career, dataKey, title) => {
+  const data = career[dataKey];
 
-    const sorted = [...data].sort((a, b) => b.importance - a.importance);
-    const topData = sorted.slice(0, 20);
+  if (!data || data.length === 0) {
+    console.warn(`No data available for ${title} in ${career.name}`);
+    return;
+  }
 
-    setGraphTitle(`${career.name} – ${title} (Top ${topData.length})`);
-    setGraphData(topData);
-    setShowGraph(true);
-  };
+  // === FILTERING LOGIC ===
+  let filtered;
+
+  if (title === "Technology") {
+    // Technology importance tends to be small
+    filtered = data.filter(d => d.importance > 0);
+  } else {
+    // All other categories use >30 threshold
+    filtered = data.filter(d => d.importance > 30);
+  }
+
+  // === SORT DESC ===
+  filtered.sort((a, b) => b.importance - a.importance);
+
+  // === FALLBACK IF EMPTY ===
+  if (filtered.length === 0) {
+    console.warn(`Fallback: nothing > threshold for ${title}, using top 10`);
+    filtered = [...data]
+      .sort((a, b) => b.importance - a.importance)
+      .slice(0, 10);
+  }
+
+  // === UI SET STATE ===
+  setGraphTitle(`${career.name} – ${title} (${filtered.length})`);
+  setGraphData(filtered);
+  setShowGraph(true);
+};
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem("authUser");
