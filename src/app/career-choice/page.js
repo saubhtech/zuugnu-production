@@ -22,32 +22,24 @@ export default function CareerChoicePage() {
   const router = useRouter();
 
   const filterIcons = {
-    8: "💪", // Ability
-    9: "⚡", // Activity
-    10: "🏭", // Industry
-    11: "❤️", // Interest
-    12: "📚", // Knowledge
-    13: "📈", // Outlook
-    14: "🛤️", // Pathway
-    15: "⭐", // Preference
-    16: "🎯", // Sector
-    17: "🔧", // Skills
-    18: "🔬", // STEM
-    19: "💻", // Technology
-    20: "🎭", // Traits
-    21: "🌍", // Zone
+    8: "💪", 9: "⚡", 10: "🏭", 11: "❤️", 12: "📚", 13: "📈", 
+    14: "🛤️", 15: "⭐", 16: "🎯", 17: "🔧", 18: "🔬", 
+    19: "💻", 20: "🎭", 21: "🌍"
   };
 
-  const openAbilityGraph = (career) => {
-    const filtered = career.ability.filter((a) => a.importance > 30);
-
-    if (filtered.length === 0) {
-      alert("No abilities with importance above 30");
-      return;
+  // ✅ Helper to show graph with top data
+  const showTopData = (career, dataKey, title) => {
+    const data = career[dataKey];
+    
+    if (!data || data.length === 0) {
+      return; // Do nothing if no data
     }
 
-    setGraphTitle(career.name + " – Career Abilities");
-    setGraphData(filtered);
+    const sorted = [...data].sort((a, b) => b.importance - a.importance);
+    const topData = sorted.slice(0, 20);
+
+    setGraphTitle(`${career.name} – ${title} (Top ${topData.length})`);
+    setGraphData(topData);
     setShowGraph(true);
   };
 
@@ -66,10 +58,6 @@ export default function CareerChoicePage() {
       const response = await fetch("/api/career/filters");
       const data = await response.json();
 
-      console.log("📦 API Response:", data); // DEBUG
-      console.log("📋 Filter Options:", data.filters); // DEBUG
-      console.log("📊 Filter Count:", Object.keys(data.filters || {}).length); // DEBUG
-
       if (data.success) {
         setFilterOptions(data.filters);
       }
@@ -87,8 +75,9 @@ export default function CareerChoicePage() {
     try {
       const cleanedFilters = Object.entries(selectedFilters).reduce(
         (acc, [key, value]) => {
-          if (value && value.length > 0 && value[0] !== null) {
-            acc[key] = value;
+          if (value && value.length > 0) {
+            // ✅ Support multiple selections per filter
+            acc[key] = value.filter(v => v !== null && v !== "");
           }
           return acc;
         },
@@ -104,11 +93,6 @@ export default function CareerChoicePage() {
       const data = await response.json();
 
       if (data.success) {
-        console.log("🔍 First career:", data.careers[0]); // <-- ADD THIS LINE
-        console.log(
-          "📋 First 10 careers from API:",
-          data.careers.slice(0, 10).map((c) => c.name)
-        );
         setCareers(data.careers);
       }
     } catch (error) {
@@ -151,44 +135,67 @@ export default function CareerChoicePage() {
         </div>
       </header>
 
-      <div className="filters-section">
-        <div className="filters-grid">
-          {Object.entries(filterOptions).map(([choiceId, filter]) => (
-            <div key={choiceId} className="filter-item">
-              <label className="filter-label">
-                <span className="filter-icon">
-                  {filterIcons[choiceId] || "🔹"}
-                </span>
-                {filter.name}
-              </label>
-              <select
-                value={selectedFilters[choiceId]?.[0] || ""}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value) {
-                    setSelectedFilters((prev) => ({
-                      ...prev,
-                      [choiceId]: [parseInt(value)],
-                    }));
-                  } else {
-                    const newFilters = { ...selectedFilters };
-                    delete newFilters[choiceId];
-                    setSelectedFilters(newFilters);
-                  }
-                }}
-              >
-                <option value="">Select {filter.name}</option>
-                {filter.options.map((opt) => (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+<div className="filters-section">
+  <div className="filters-grid">
+    {Object.entries(filterOptions).map(([choiceId, filter]) => (
+      <div key={choiceId} className="filter-item">
+        <div className="filter-header">
+          <label className="filter-label">
+            <span className="filter-icon">
+              {filterIcons[choiceId] || "🔹"}
+            </span>
+            {filter.name}
+          </label>
+          
+          {/* ✅ Clear button for this filter */}
+          {selectedFilters[choiceId]?.length > 0 && (
+            <button
+              onClick={() => {
+                setSelectedFilters((prev) => {
+                  const newFilters = { ...prev };
+                  delete newFilters[choiceId];
+                  return newFilters;
+                });
+              }}
+              className="clear-filter-btn"
+              title="Clear selection"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        
+        {/* Scrollable multi-select */}
+        <select
+          multiple
+          size="5"
+          value={selectedFilters[choiceId] || []}
+          onChange={(e) => {
+            const selectedOptions = Array.from(
+              e.target.selectedOptions, 
+              option => parseInt(option.value)
+            );
+            setSelectedFilters((prev) => ({
+              ...prev,
+              [choiceId]: selectedOptions
+            }));
+          }}
+        >
+          {filter.options.map((opt) => (
+            <option key={opt.id} value={opt.id}>
+              {opt.label}
+            </option>
           ))}
+        </select>
+        
+        {/* Show selection count */}
+        <div className="selected-count">
+          {selectedFilters[choiceId]?.length || 0} selected
         </div>
       </div>
-
+    ))}
+  </div>
+</div>
       <div className="controls">
         <div className="show-entries">
           <span>Show</span>
@@ -251,17 +258,8 @@ export default function CareerChoicePage() {
           <tbody>
             {displayedCareers.length === 0 ? (
               <tr>
-                <td
-                  colSpan="8"
-                  style={{
-                    textAlign: "center",
-                    padding: "40px",
-                    color: "#64748b",
-                  }}
-                >
-                  {searching
-                    ? "Searching..."
-                    : "No careers found. Select filters and click Apply."}
+                <td colSpan="8" style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+                  {searching ? "Searching..." : "No careers found. Select filters and click Apply."}
                 </td>
               </tr>
             ) : (
@@ -270,142 +268,79 @@ export default function CareerChoicePage() {
                   <td className="occupation-name" title={career.details}>
                     {career.name}
                   </td>
+                  
+                  {/* ✅ Abilities - Disabled if no data */}
                   <td>
                     <span
-                      className="graph-icon clickable"
-                      onClick={() => {
-                        const filtered = career.ability.filter(
-                          (a) => a.importance > 30
-                        );
-                        if (filtered.length === 0)
-                          return alert("No data above 30");
-                        setGraphTitle(career.name + " – Abilities");
-                        setGraphData(filtered);
-                        setShowGraph(true);
-                      }}
+                      className={`graph-icon ${career.ability?.length > 0 ? 'clickable' : 'disabled'}`}
+                      onClick={() => showTopData(career, 'ability', 'Abilities')}
+                      title={career.ability?.length > 0 ? 'View abilities' : 'No data available'}
                     >
                       📊
                     </span>
                   </td>
+                  
+                  {/* ✅ Activities */}
                   <td>
                     <span
-                      className="graph-icon clickable"
-                      onClick={() => {
-                        const filtered = career.activity.filter(
-                          (a) => a.importance > 30
-                        );
-                        if (filtered.length === 0)
-                          return alert("No data above 30");
-                        setGraphTitle(career.name + " – Activities");
-                        setGraphData(filtered);
-                        setShowGraph(true);
-                      }}
+                      className={`graph-icon ${career.activity?.length > 0 ? 'clickable' : 'disabled'}`}
+                      onClick={() => showTopData(career, 'activity', 'Activities')}
+                      title={career.activity?.length > 0 ? 'View activities' : 'No data available'}
                     >
                       📊
                     </span>
                   </td>
+                  
+                  {/* ✅ Knowledge */}
                   <td>
                     <span
-                      className="graph-icon clickable"
-                      onClick={() => {
-                        const filtered = career.knowledge.filter(
-                          (a) => a.importance > 30
-                        );
-                        if (filtered.length === 0)
-                          return alert("No data above 30");
-                        setGraphTitle(career.name + " – Knowledge");
-                        setGraphData(filtered);
-                        setShowGraph(true);
-                      }}
+                      className={`graph-icon ${career.knowledge?.length > 0 ? 'clickable' : 'disabled'}`}
+                      onClick={() => showTopData(career, 'knowledge', 'Knowledge')}
+                      title={career.knowledge?.length > 0 ? 'View knowledge' : 'No data available'}
                     >
                       📊
                     </span>
                   </td>
+                  
+                  {/* ✅ Preference */}
                   <td>
                     <span
-                      className="graph-icon clickable"
-                      onClick={() => {
-                        const filtered = career.preference.filter(
-                          (a) => a.importance > 30
-                        );
-                        if (filtered.length === 0)
-                          return alert("No data above 30");
-                        setGraphTitle(career.name + " – Preference");
-                        setGraphData(filtered);
-                        setShowGraph(true);
-                      }}
+                      className={`graph-icon ${career.preference?.length > 0 ? 'clickable' : 'disabled'}`}
+                      onClick={() => showTopData(career, 'preference', 'Preference')}
+                      title={career.preference?.length > 0 ? 'View preference' : 'No data available'}
                     >
                       📊
                     </span>
                   </td>
+                  
+                  {/* ✅ Skills */}
                   <td>
                     <span
-                      className="graph-icon clickable"
-                      onClick={() => {
-                        const filtered = career.skills.filter(
-                          (a) => a.importance > 30
-                        );
-                        if (filtered.length === 0)
-                          return alert("No data above 30");
-                        setGraphTitle(career.name + " – Skills");
-                        setGraphData(filtered);
-                        setShowGraph(true);
-                      }}
+                      className={`graph-icon ${career.skills?.length > 0 ? 'clickable' : 'disabled'}`}
+                      onClick={() => showTopData(career, 'skills', 'Skills')}
+                      title={career.skills?.length > 0 ? 'View skills' : 'No data available'}
                     >
                       📊
                     </span>
                   </td>
+                  
+                  {/* ✅ Technology */}
                   <td>
                     <span
-                      className="graph-icon clickable"
-                      onClick={() => {
-                        console.log("🔍 Full career object:", career); // DEBUG
-                        console.log("🔍 Technology data:", career.technology); // DEBUG
-
-                        if (
-                          !career.technology ||
-                          career.technology.length === 0
-                        ) {
-                          return alert(
-                            "No technology data available for this career"
-                          );
-                        }
-
-                        // ✅ Sort by importance and show top items
-                        const sorted = [...career.technology].sort(
-                          (a, b) => b.importance - a.importance
-                        );
-
-                        // ✅ Show top 20 or all if less than 20
-                        const topTech = sorted.slice(0, 20);
-
-                        if (topTech.length === 0) {
-                          return alert("No technology data available");
-                        }
-
-                        setGraphTitle(
-                          `${career.name} – Technology (Top ${topTech.length})`
-                        );
-                        setGraphData(topTech);
-                        setShowGraph(true);
-                      }}
+                      className={`graph-icon ${career.technology?.length > 0 ? 'clickable' : 'disabled'}`}
+                      onClick={() => showTopData(career, 'technology', 'Technology')}
+                      title={career.technology?.length > 0 ? 'View technology' : 'No data available'}
                     >
                       📊
                     </span>
                   </td>
+                  
+                  {/* ✅ Traits */}
                   <td>
                     <span
-                      className="graph-icon clickable"
-                      onClick={() => {
-                        const filtered = career.traits.filter(
-                          (a) => a.importance > 30
-                        );
-                        if (filtered.length === 0)
-                          return alert("No data above 30");
-                        setGraphTitle(career.name + " – Traits");
-                        setGraphData(filtered);
-                        setShowGraph(true);
-                      }}
+                      className={`graph-icon ${career.traits?.length > 0 ? 'clickable' : 'disabled'}`}
+                      onClick={() => showTopData(career, 'traits', 'Traits')}
+                      title={career.traits?.length > 0 ? 'View traits' : 'No data available'}
                     >
                       📊
                     </span>
@@ -419,49 +354,20 @@ export default function CareerChoicePage() {
 
       <div className="pagination">
         <div className="pagination-info">
-          Showing {startIndex + 1} to{" "}
-          {Math.min(endIndex, filteredCareers.length)} of{" "}
-          {filteredCareers.length} records
+          Showing {startIndex + 1} to {Math.min(endIndex, filteredCareers.length)} of {filteredCareers.length} records
         </div>
         <div className="pagination-buttons">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(1)}
-          >
-            First
-          </button>
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-          >
-            Previous
-          </button>
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-          >
-            Next
-          </button>
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(totalPages)}
-          >
-            Last
-          </button>
+          <button disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>First</button>
+          <button disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>Previous</button>
+          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>Next</button>
+          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>Last</button>
         </div>
       </div>
 
       {showGraph && (
-        <div className="graph-modal-overlay">
-          <div className="graph-modal">
-            {/* TOP CLOSE ICON */}
-            <button
-              className="graph-close-icon"
-              onClick={() => setShowGraph(false)}
-              aria-label="Close graph"
-            >
-              ×
-            </button>
+        <div className="graph-modal-overlay" onClick={() => setShowGraph(false)}>
+          <div className="graph-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="graph-close-icon" onClick={() => setShowGraph(false)}>×</button>
 
             <div className="graph-modal-header">
               <h2>{graphTitle}</h2>
@@ -470,22 +376,13 @@ export default function CareerChoicePage() {
 
             <div className="graph-bars">
               {graphData.map((item, idx) => {
-                const barHeight =
-                  graphData.length > 10
-                    ? "14px"
-                    : graphData.length > 6
-                    ? "16px"
-                    : "18px";
+                const barHeight = graphData.length > 10 ? "14px" : graphData.length > 6 ? "16px" : "18px";
 
                 return (
                   <div key={idx} className="bar-row">
                     <span className="bar-label">{item.option}</span>
-
                     <div className="bar" style={{ height: barHeight }}>
-                      <div
-                        className="bar-fill"
-                        style={{ width: `${item.importance}%` }}
-                      >
+                      <div className="bar-fill" style={{ width: `${item.importance}%` }}>
                         {item.importance}%
                       </div>
                     </div>
@@ -495,9 +392,7 @@ export default function CareerChoicePage() {
             </div>
 
             <div className="graph-modal-footer">
-              <button className="close-btn" onClick={() => setShowGraph(false)}>
-                Close
-              </button>
+              <button className="close-btn" onClick={() => setShowGraph(false)}>Close</button>
             </div>
           </div>
         </div>
