@@ -1,13 +1,63 @@
+"use client";
+
 export default function CreatorsTab() {
   return (
-    <>
-      <h1 className="page-title">Creators</h1>
-      <input className="search-input" placeholder="Search creators..." />
+    <div className="creators-container">
 
-      <div className="table">
-        <div className="row head"><div>Creator</div><div>Email</div><div>Completed</div><div>Earnings</div><div>Status</div><div>Actions</div></div>
-        <div className="row"><div>Sarah Chen</div><div>sarah@ugc.com</div><div>42</div><div>$3,240</div><div>Active</div><div>Manage</div></div>
+      <h1 className="page-title">Creator Management</h1>
+      <p className="page-sub">Manage UGC creators and their performance</p>
+
+      <div className="creator-top">
+        <div className="search-box">
+          <span className="search-icon">🔍</span>
+          <input placeholder="Search creators..." />
+        </div>
+
+        <button className="invite-btn">
+          👥 Invite Creator
+        </button>
       </div>
-    </>
+
+      <div className="creators-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Creator</th>
+              <th>Contact</th>
+              <th>Assignments</th>
+              <th>Earnings</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>
+                <b>Sarah Chen</b>
+                <div className="mini-sub">ID: CRE-001</div>
+              </td>
+
+              <td>
+                sarah.chen@mail.com
+                <div className="mini-sub">Instagram, YouTube</div>
+              </td>
+
+              <td>8 Active / 42 Completed</td>
+
+              <td>$3,240</td>
+
+              <td><span className="status active">Active</span></td>
+
+              <td>
+                <span className="action">Edit</span>{" "}
+                <span className="action danger">Suspend</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
   );
 }

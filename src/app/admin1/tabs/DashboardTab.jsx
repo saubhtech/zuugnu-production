@@ -59,6 +59,47 @@ export default function DashboardTab() {
         </div>
       </div>
 
+      {/* Recent Activity */}
+      <div className="activity-panel">
+        <h3 className="activity-title">Recent Activity</h3>
+        <div className="activity-list">
+
+          <div className="activity-item success">
+            <div className="activity-icon">✔️</div>
+            <div className="activity-content">
+              <b>Project "Nike Summer Campaign" completed</b>
+              <p>Escrow released to consultant • 5 min ago</p>
+            </div>
+          </div>
+
+          <div className="activity-item info">
+            <div className="activity-icon">➕</div>
+            <div className="activity-content">
+              <b>New project posted by Adidas Corp</b>
+              <p>Budget: $8,500 • 15 min ago</p>
+            </div>
+          </div>
+
+          <div className="activity-item pending">
+            <div className="activity-icon">👤</div>
+            <div className="activity-content">
+              <b>New Creator "Jane Doe" registered</b>
+              <p>Awaiting approval • 30 min ago</p>
+            </div>
+          </div>
+
+          <div className="activity-item error">
+            <div className="activity-icon">⚠️</div>
+            <div className="activity-content">
+              <b>Content verification failed for "Adidas Slogan"</b>
+              <p>Auto-validation error • 1 hour ago</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
     </div>
   );
 }
