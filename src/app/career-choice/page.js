@@ -31,8 +31,11 @@ export default function CareerChoicePage() {
   const showTopData = (career, dataKey, title) => {
     const data = career[dataKey];
     
+    console.log(`Showing ${title} for ${career.name}:`, data); // Debug log
+    
     if (!data || data.length === 0) {
-      return; // Do nothing if no data
+      console.warn(`No data available for ${title} in ${career.name}`);
+      return;
     }
 
     const sorted = [...data].sort((a, b) => b.importance - a.importance);
@@ -75,14 +78,15 @@ export default function CareerChoicePage() {
     try {
       const cleanedFilters = Object.entries(selectedFilters).reduce(
         (acc, [key, value]) => {
-          if (value && value.length > 0) {
-            // ✅ Support multiple selections per filter
-            acc[key] = value.filter(v => v !== null && v !== "");
+          if (value !== null && value !== "" && value !== undefined) {
+            acc[key] = [value];
           }
           return acc;
         },
         {}
       );
+
+      console.log("Sending filters:", cleanedFilters); // Debug log
 
       const response = await fetch("/api/career/search", {
         method: "POST",
@@ -93,7 +97,24 @@ export default function CareerChoicePage() {
       const data = await response.json();
 
       if (data.success) {
+        console.log("Received careers data:", data.careers); // Debug log
+        
+        // ✅ Log each career's data structure
+        data.careers.forEach(career => {
+          console.log(`Career: ${career.name}`, {
+            ability: career.ability?.length || 0,
+            activity: career.activity?.length || 0,
+            knowledge: career.knowledge?.length || 0,
+            preference: career.preference?.length || 0,
+            skills: career.skills?.length || 0,
+            technology: career.technology?.length || 0,
+            traits: career.traits?.length || 0
+          });
+        });
+
         setCareers(data.careers);
+      } else {
+        console.error("Search failed:", data.message);
       }
     } catch (error) {
       console.error("Search failed:", error);
@@ -107,6 +128,11 @@ export default function CareerChoicePage() {
     setCareers([]);
     setSearchTerm("");
     setCurrentPage(1);
+  };
+
+  // ✅ Helper function to check if data exists and has valid items
+  const hasValidData = (data) => {
+    return data && Array.isArray(data) && data.length > 0;
   };
 
   const filteredCareers = careers.filter((career) =>
@@ -135,67 +161,72 @@ export default function CareerChoicePage() {
         </div>
       </header>
 
-<div className="filters-section">
-  <div className="filters-grid">
-    {Object.entries(filterOptions).map(([choiceId, filter]) => (
-      <div key={choiceId} className="filter-item">
-        <div className="filter-header">
-          <label className="filter-label">
-            <span className="filter-icon">
-              {filterIcons[choiceId] || "🔹"}
-            </span>
-            {filter.name}
-          </label>
-          
-          {/* ✅ Clear button for this filter */}
-          {selectedFilters[choiceId]?.length > 0 && (
-            <button
-              onClick={() => {
-                setSelectedFilters((prev) => {
-                  const newFilters = { ...prev };
-                  delete newFilters[choiceId];
-                  return newFilters;
-                });
-              }}
-              className="clear-filter-btn"
-              title="Clear selection"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-        
-        {/* Scrollable multi-select */}
-        <select
-          multiple
-          size="5"
-          value={selectedFilters[choiceId] || []}
-          onChange={(e) => {
-            const selectedOptions = Array.from(
-              e.target.selectedOptions, 
-              option => parseInt(option.value)
-            );
-            setSelectedFilters((prev) => ({
-              ...prev,
-              [choiceId]: selectedOptions
-            }));
-          }}
-        >
-          {filter.options.map((opt) => (
-            <option key={opt.id} value={opt.id}>
-              {opt.label}
-            </option>
+      <div className="filters-section">
+        <div className="filters-grid">
+          {Object.entries(filterOptions).map(([choiceId, filter]) => (
+            <div key={choiceId} className="filter-item">
+              <div className="filter-header">
+                <label className="filter-label">
+                  <span className="filter-icon">
+                    {filterIcons[choiceId] || "🔹"}
+                  </span>
+                  {filter.name}
+                </label>
+                
+                {selectedFilters[choiceId] && (
+                  <button
+                    onClick={() => {
+                      setSelectedFilters((prev) => {
+                        const newFilters = { ...prev };
+                        delete newFilters[choiceId];
+                        return newFilters;
+                      });
+                    }}
+                    className="clear-filter-btn"
+                    title="Clear selection"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              
+              <select
+                value={selectedFilters[choiceId] || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setSelectedFilters((prev) => {
+                      const newFilters = { ...prev };
+                      delete newFilters[choiceId];
+                      return newFilters;
+                    });
+                  } else {
+                    setSelectedFilters((prev) => ({
+                      ...prev,
+                      [choiceId]: parseInt(value)
+                    }));
+                  }
+                }}
+                className="single-select-dropdown"
+              >
+                <option value="">-- Select an option --</option>
+                {filter.options.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              
+              {selectedFilters[choiceId] && (
+                <div className="selected-option">
+                  ✓ {filter.options.find(o => o.id === selectedFilters[choiceId])?.label}
+                </div>
+              )}
+            </div>
           ))}
-        </select>
-        
-        {/* Show selection count */}
-        <div className="selected-count">
-          {selectedFilters[choiceId]?.length || 0} selected
         </div>
       </div>
-    ))}
-  </div>
-</div>
+
       <div className="controls">
         <div className="show-entries">
           <span>Show</span>
@@ -269,12 +300,12 @@ export default function CareerChoicePage() {
                     {career.name}
                   </td>
                   
-                  {/* ✅ Abilities - Disabled if no data */}
+                  {/* ✅ Abilities */}
                   <td>
                     <span
-                      className={`graph-icon ${career.ability?.length > 0 ? 'clickable' : 'disabled'}`}
-                      onClick={() => showTopData(career, 'ability', 'Abilities')}
-                      title={career.ability?.length > 0 ? 'View abilities' : 'No data available'}
+                      className={`graph-icon ${hasValidData(career.ability) ? 'clickable' : 'disabled'}`}
+                      onClick={() => hasValidData(career.ability) && showTopData(career, 'ability', 'Abilities')}
+                      title={hasValidData(career.ability) ? `View ${career.ability.length} abilities` : 'No data available'}
                     >
                       📊
                     </span>
@@ -283,9 +314,9 @@ export default function CareerChoicePage() {
                   {/* ✅ Activities */}
                   <td>
                     <span
-                      className={`graph-icon ${career.activity?.length > 0 ? 'clickable' : 'disabled'}`}
-                      onClick={() => showTopData(career, 'activity', 'Activities')}
-                      title={career.activity?.length > 0 ? 'View activities' : 'No data available'}
+                      className={`graph-icon ${hasValidData(career.activity) ? 'clickable' : 'disabled'}`}
+                      onClick={() => hasValidData(career.activity) && showTopData(career, 'activity', 'Activities')}
+                      title={hasValidData(career.activity) ? `View ${career.activity.length} activities` : 'No data available'}
                     >
                       📊
                     </span>
@@ -294,9 +325,9 @@ export default function CareerChoicePage() {
                   {/* ✅ Knowledge */}
                   <td>
                     <span
-                      className={`graph-icon ${career.knowledge?.length > 0 ? 'clickable' : 'disabled'}`}
-                      onClick={() => showTopData(career, 'knowledge', 'Knowledge')}
-                      title={career.knowledge?.length > 0 ? 'View knowledge' : 'No data available'}
+                      className={`graph-icon ${hasValidData(career.knowledge) ? 'clickable' : 'disabled'}`}
+                      onClick={() => hasValidData(career.knowledge) && showTopData(career, 'knowledge', 'Knowledge')}
+                      title={hasValidData(career.knowledge) ? `View ${career.knowledge.length} knowledge areas` : 'No data available'}
                     >
                       📊
                     </span>
@@ -305,9 +336,9 @@ export default function CareerChoicePage() {
                   {/* ✅ Preference */}
                   <td>
                     <span
-                      className={`graph-icon ${career.preference?.length > 0 ? 'clickable' : 'disabled'}`}
-                      onClick={() => showTopData(career, 'preference', 'Preference')}
-                      title={career.preference?.length > 0 ? 'View preference' : 'No data available'}
+                      className={`graph-icon ${hasValidData(career.preference) ? 'clickable' : 'disabled'}`}
+                      onClick={() => hasValidData(career.preference) && showTopData(career, 'preference', 'Preference')}
+                      title={hasValidData(career.preference) ? `View ${career.preference.length} preferences` : 'No data available'}
                     >
                       📊
                     </span>
@@ -316,9 +347,9 @@ export default function CareerChoicePage() {
                   {/* ✅ Skills */}
                   <td>
                     <span
-                      className={`graph-icon ${career.skills?.length > 0 ? 'clickable' : 'disabled'}`}
-                      onClick={() => showTopData(career, 'skills', 'Skills')}
-                      title={career.skills?.length > 0 ? 'View skills' : 'No data available'}
+                      className={`graph-icon ${hasValidData(career.skills) ? 'clickable' : 'disabled'}`}
+                      onClick={() => hasValidData(career.skills) && showTopData(career, 'skills', 'Skills')}
+                      title={hasValidData(career.skills) ? `View ${career.skills.length} skills` : 'No data available'}
                     >
                       📊
                     </span>
@@ -327,9 +358,9 @@ export default function CareerChoicePage() {
                   {/* ✅ Technology */}
                   <td>
                     <span
-                      className={`graph-icon ${career.technology?.length > 0 ? 'clickable' : 'disabled'}`}
-                      onClick={() => showTopData(career, 'technology', 'Technology')}
-                      title={career.technology?.length > 0 ? 'View technology' : 'No data available'}
+                      className={`graph-icon ${hasValidData(career.technology) ? 'clickable' : 'disabled'}`}
+                      onClick={() => hasValidData(career.technology) && showTopData(career, 'technology', 'Technology')}
+                      title={hasValidData(career.technology) ? `View ${career.technology.length} technologies` : 'No data available'}
                     >
                       📊
                     </span>
@@ -338,9 +369,9 @@ export default function CareerChoicePage() {
                   {/* ✅ Traits */}
                   <td>
                     <span
-                      className={`graph-icon ${career.traits?.length > 0 ? 'clickable' : 'disabled'}`}
-                      onClick={() => showTopData(career, 'traits', 'Traits')}
-                      title={career.traits?.length > 0 ? 'View traits' : 'No data available'}
+                      className={`graph-icon ${hasValidData(career.traits) ? 'clickable' : 'disabled'}`}
+                      onClick={() => hasValidData(career.traits) && showTopData(career, 'traits', 'Traits')}
+                      title={hasValidData(career.traits) ? `View ${career.traits.length} traits` : 'No data available'}
                     >
                       📊
                     </span>
