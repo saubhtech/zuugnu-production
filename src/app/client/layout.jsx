@@ -42,11 +42,35 @@ export default function ClientLayout() {
 
       {/* TOP BAR */}
       <header className="client-topbar">
-        <div>
-          <div className="brand">UGC SMA Platform</div>
-          <div className="sub">Client Portal</div>
-        </div>
-      </header>
+
+  {/* LEFT BRAND */}
+  <div className="brand-left">
+    <div className="brand-icon">🚀</div>
+    <div>
+      <div className="brand-title">UGC SMA Platform</div>
+      <div className="brand-sub">Client Portal</div>
+    </div>
+  </div>
+
+  {/* RIGHT USER AREA */}
+  <div className="brand-right">
+    <div className="notify-icon">
+      🔔
+      <span className="notify-dot" />
+    </div>
+
+    <div className="user-chip">
+      <span className="user-badge">CL</span>
+      <span className="user-name">Nike Inc.</span>
+    </div>
+
+    <div className="logout-btn">
+      ↪
+    </div>
+  </div>
+
+</header>
+
 
       {/* FULL BODY */}
       <div className="client-body">
