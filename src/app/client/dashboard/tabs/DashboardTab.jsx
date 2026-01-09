@@ -75,7 +75,7 @@ export default function DashboardTab() {
         <div className="panel">
           <h3>Campaign Performance</h3>
           <div className="placeholder-chart">
-            <span>Chart Coming Soon</span>
+            <span>Chart📈</span>
           </div>
         </div>
 
