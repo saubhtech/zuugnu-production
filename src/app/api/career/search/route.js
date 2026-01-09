@@ -3,31 +3,29 @@ import { Pool } from "pg";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: false
+  ssl: false,
 });
 
 export async function POST(req) {
   try {
     const { filters } = await req.json();
-    console.log("Filters:", filters);
 
-    // 🔹 Return EMPTY if no filters
+    // Return empty if no filters (matches senior)
     if (!filters || Object.keys(filters).length === 0) {
       return NextResponse.json({
         success: true,
         careers: [],
-        count: 0
+        count: 0,
       });
     }
 
-    // 🔹 Convert selected filters → mast_id array
-    const selectedMastIds = Object.values(filters).flat().map(v => Number(v));
+    const selectedMastIds = Object.values(filters)
+      .flat()
+      .map((v) => Number(v));
     const filterCount = selectedMastIds.length;
 
-    console.log("Selected Mast Ids:", selectedMastIds, "Count:", filterCount);
-
-    // 🔹 Phase 1: Raw filtering (OR logic)
-    const rawResult = await pool.query(
+    // Phase 1: filter attributes (OR logic)
+    const raw = await pool.query(
       `
       WITH filtered AS (
         SELECT cd.careercode,
@@ -39,8 +37,9 @@ export async function POST(req) {
       ),
       validated AS (
         SELECT careercode,
-               COUNT(DISTINCT choice_id) AS matched_categories,
-               SUM(importance) AS score
+               SUM(importance) AS score,
+               COUNT(DISTINCT choice_id) AS categories,
+               COUNT(*) FILTER (WHERE importance > 30) AS density
         FROM filtered
         GROUP BY careercode
         HAVING COUNT(DISTINCT choice_id) = $2
@@ -49,30 +48,34 @@ export async function POST(req) {
              c.careercode,
              c.career,
              c.details,
-             v.score
+             v.score,
+             v.categories,
+             v.density
       FROM validated v
       JOIN public.career c ON c.careercode = v.careercode
-      ORDER BY v.score DESC
+      ORDER BY v.score ASC,
+         v.categories DESC,
+         v.density DESC,
+         c.career ASC
+
       LIMIT 100;
-      `,
+    `,
       [selectedMastIds, filterCount]
     );
 
-    const careers = rawResult.rows;
-    console.log("Matched Careers:", careers.length);
-
+    const careers = raw.rows;
     if (careers.length === 0) {
       return NextResponse.json({
         success: true,
         careers: [],
-        count: 0
+        count: 0,
       });
     }
 
-    // 🔹 Phase 2: Fetch attributes for top N careers
-    const careerCodes = careers.map(c => c.careercode);
+    // Phase 2: expand attributes
+    const careerCodes = careers.map((c) => c.careercode);
 
-    const attrsResult = await pool.query(
+    const attrs = await pool.query(
       `
       SELECT cd.careercode,
              cc.career_choice,
@@ -83,52 +86,50 @@ export async function POST(req) {
       JOIN public.career_choice cc ON cm.choice_id = cc.choice_id
       WHERE cd.careercode = ANY($1)
       ORDER BY cd.careercode, cc.choice_id, cd.importance DESC;
-      `,
+    `,
       [careerCodes]
     );
 
-    // 🔹 Group attributes by category
-    const attrs = {};
-    attrsResult.rows.forEach(row => {
-      if (!attrs[row.careercode]) attrs[row.careercode] = {};
-      if (!attrs[row.careercode][row.career_choice]) {
-        attrs[row.careercode][row.career_choice] = [];
+    // Phase 3: structure results
+    const grouped = {};
+    attrs.rows.forEach((row) => {
+      if (!grouped[row.careercode]) grouped[row.careercode] = {};
+      if (!grouped[row.careercode][row.career_choice]) {
+        grouped[row.careercode][row.career_choice] = [];
       }
-      attrs[row.careercode][row.career_choice].push({
+      grouped[row.careercode][row.career_choice].push({
         option: row.option,
-        importance: row.importance
+        importance: row.importance,
       });
     });
 
-    // 🔹 Final formatted careers
-    const finalCareers = careers.map(c => ({
+    const final = careers.map((c) => ({
       id: c.career_id,
       careercode: c.careercode,
       name: c.career,
       details: c.details,
       score: c.score,
-      ability: attrs[c.careercode]?.["Career Ability"] || [],
-      activity: attrs[c.careercode]?.["Career Activity"] || [],
-      industry: attrs[c.careercode]?.["Career Industry"] || [],
-      interest: attrs[c.careercode]?.["Career Interest"] || [],
-      knowledge: attrs[c.careercode]?.["Career Knowledge"] || [],
-      outlook: attrs[c.careercode]?.["Career Outlook"] || [],
-      pathway: attrs[c.careercode]?.["Career Pathway"] || [],
-      preference: attrs[c.careercode]?.["Career Preference"] || [],
-      sector: attrs[c.careercode]?.["Career Sector"] || [],
-      skills: attrs[c.careercode]?.["Career Skills"] || [],
-      stem: attrs[c.careercode]?.["Career STEM"] || [],
-      technology: attrs[c.careercode]?.["Career Technology"] || [],
-      traits: attrs[c.careercode]?.["Career Traits"] || [],
-      zone: attrs[c.careercode]?.["Career Zone"] || [],
+      ability: grouped[c.careercode]?.["Career Ability"] || [],
+      activity: grouped[c.careercode]?.["Career Activity"] || [],
+      industry: grouped[c.careercode]?.["Career Industry"] || [],
+      interest: grouped[c.careercode]?.["Career Interest"] || [],
+      knowledge: grouped[c.careercode]?.["Career Knowledge"] || [],
+      outlook: grouped[c.careercode]?.["Career Outlook"] || [],
+      pathway: grouped[c.careercode]?.["Career Pathway"] || [],
+      preference: grouped[c.careercode]?.["Career Preference"] || [],
+      sector: grouped[c.careercode]?.["Career Sector"] || [],
+      skills: grouped[c.careercode]?.["Career Skills"] || [],
+      stem: grouped[c.careercode]?.["Career STEM"] || [],
+      technology: grouped[c.careercode]?.["Career Technology"] || [],
+      traits: grouped[c.careercode]?.["Career Traits"] || [],
+      zone: grouped[c.careercode]?.["Career Zone"] || [],
     }));
 
     return NextResponse.json({
       success: true,
-      careers: finalCareers,
-      count: finalCareers.length
+      careers: final,
+      count: final.length,
     });
-
   } catch (err) {
     console.error("Search Error:", err);
     return NextResponse.json(
