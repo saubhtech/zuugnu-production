@@ -1056,6 +1056,32 @@
   cursor: pointer;
 }
 
+.earn-chart-placeholder.line-graph {
+  height: 180px;
+  width: 100%;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 10px;
+  position: relative;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.earn-chart-placeholder svg {
+  width: 95%;
+  height: 120px;
+}
+
+.chart-value {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
 
 .proj-details p {
   font-weight: 600;

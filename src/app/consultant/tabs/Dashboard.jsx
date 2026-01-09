@@ -46,7 +46,6 @@ export default function DashboardTab() {
 
       {/* ===== MAIN GRID (Left + Right) ===== */}
       <div className="main-grid">
-        
         {/* LEFT: ACTIVE PROJECTS */}
         <div className="panel">
           <h3>Active Projects</h3>
@@ -58,10 +57,22 @@ export default function DashboardTab() {
             </div>
 
             <div className="proj-details">
-              <div><small>Budget</small><p>$5,000</p></div>
-              <div><small>Creators</small><p>12 assigned</p></div>
-              <div><small>Progress</small><p>65%</p></div>
-              <div><small>Due</small><p>12 days</p></div>
+              <div>
+                <small>Budget</small>
+                <p>$5,000</p>
+              </div>
+              <div>
+                <small>Creators</small>
+                <p>12 assigned</p>
+              </div>
+              <div>
+                <small>Progress</small>
+                <p>65%</p>
+              </div>
+              <div>
+                <small>Due</small>
+                <p>12 days</p>
+              </div>
             </div>
 
             <div className="progress-bar purple">
@@ -76,10 +87,22 @@ export default function DashboardTab() {
             </div>
 
             <div className="proj-details">
-              <div><small>Budget</small><p>$2,500</p></div>
-              <div><small>Creators</small><p>8 assigned</p></div>
-              <div><small>Progress</small><p>80%</p></div>
-              <div><small>Due</small><p>5 days</p></div>
+              <div>
+                <small>Budget</small>
+                <p>$2,500</p>
+              </div>
+              <div>
+                <small>Creators</small>
+                <p>8 assigned</p>
+              </div>
+              <div>
+                <small>Progress</small>
+                <p>80%</p>
+              </div>
+              <div>
+                <small>Due</small>
+                <p>5 days</p>
+              </div>
             </div>
 
             <div className="progress-bar blue">
@@ -90,13 +113,22 @@ export default function DashboardTab() {
 
         {/* RIGHT: EARNINGS OVERVIEW */}
         <div className="panel earnings-panel">
-          <h3>Earnings Overview</h3>
+  <h3>Earnings Overview</h3>
 
-          <div className="earn-chart-placeholder">
-            <p className="chart-label">$14,000</p>
-            {/* This is placeholder; can convert to real chart later */}
-          </div>
-        </div>
+  <div className="earn-chart-placeholder line-graph">
+    <svg viewBox="0 0 200 80" preserveAspectRatio="none">
+      <polyline 
+        fill="none" 
+        stroke="#7c3aed" 
+        strokeWidth="2"
+        points="0,60 30,40 60,50 90,20 120,35 150,10 180,25 200,5"
+        strokeLinecap="round"
+      />
+    </svg>
+    <p className="chart-value">$14,000</p>
+  </div>
+</div>
+
       </div>
     </div>
   );
