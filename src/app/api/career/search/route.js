@@ -14,6 +14,7 @@ export async function POST(req) {
     let careersResult;
 
     if (!filters || Object.keys(filters).length === 0) {
+      // No filters - return top 100 careers by importance
       careersResult = await pool.query(`
         SELECT 
           c.career_id, 
@@ -57,6 +58,7 @@ export async function POST(req) {
     }
 
     const careers = careersResult.rows;
+    console.log(`📋 Found ${careers.length} careers`);
 
     if (careers.length === 0) {
       return NextResponse.json({ success: true, careers: [], count: 0 });
@@ -64,6 +66,7 @@ export async function POST(req) {
 
     const careerCodes = careers.map((c) => c.careercode);
 
+    // ✅ Fetch ALL attributes for these careers (not just filtered ones)
     const attrsResult = await pool.query(
       `
       SELECT
@@ -79,6 +82,8 @@ export async function POST(req) {
     `,
       [careerCodes]
     );
+
+    console.log(`📊 Found ${attrsResult.rows.length} total attribute records`);
 
     const attrByCareer = {};
 
@@ -97,28 +102,51 @@ export async function POST(req) {
       });
     });
 
-    const finalCareers = careers.map((c) => ({
-      id: c.career_id,
-      careercode: c.careercode,
-      name: c.career,
-      details: c.details,
-      ability: attrByCareer[c.careercode]?.["Career Ability"] || [],
-      activity: attrByCareer[c.careercode]?.["Career Activity"] || [],
-      industry: attrByCareer[c.careercode]?.["Career Industry"] || [],
-      interest: attrByCareer[c.careercode]?.["Career Interest"] || [],
-      knowledge: attrByCareer[c.careercode]?.["Career Knowledge"] || [],
-      outlook: attrByCareer[c.careercode]?.["Career Outlook"] || [],
-      pathway: attrByCareer[c.careercode]?.["Career Pathway"] || [],
-      preference: attrByCareer[c.careercode]?.["Career Preference"] || [],
-      sector: attrByCareer[c.careercode]?.["Career Sector"] || [],
-      skills: attrByCareer[c.careercode]?.["Career Skills"] || [],
-      stem: attrByCareer[c.careercode]?.["Career STEM"] || [],
-      technology: attrByCareer[c.careercode]?.["Career Technology"] || [],
-      traits: attrByCareer[c.careercode]?.["Career Traits"] || [],
-      zone: attrByCareer[c.careercode]?.["Career Zone"] || [],
-    }));
+    const finalCareers = careers.map((c) => {
+      const careerData = {
+        id: c.career_id,
+        careercode: c.careercode,
+        name: c.career,
+        details: c.details,
+        ability: attrByCareer[c.careercode]?.["Career Ability"] || [],
+        activity: attrByCareer[c.careercode]?.["Career Activity"] || [],
+        industry: attrByCareer[c.careercode]?.["Career Industry"] || [],
+        interest: attrByCareer[c.careercode]?.["Career Interest"] || [],
+        knowledge: attrByCareer[c.careercode]?.["Career Knowledge"] || [],
+        outlook: attrByCareer[c.careercode]?.["Career Outlook"] || [],
+        pathway: attrByCareer[c.careercode]?.["Career Pathway"] || [],
+        preference: attrByCareer[c.careercode]?.["Career Preference"] || [],
+        sector: attrByCareer[c.careercode]?.["Career Sector"] || [],
+        skills: attrByCareer[c.careercode]?.["Career Skills"] || [],
+        stem: attrByCareer[c.careercode]?.["Career STEM"] || [],
+        technology: attrByCareer[c.careercode]?.["Career Technology"] || [],
+        traits: attrByCareer[c.careercode]?.["Career Traits"] || [],
+        zone: attrByCareer[c.careercode]?.["Career Zone"] || [],
+      };
 
-    console.log("✅ Returning", finalCareers.length, "careers");
+      // Log careers with missing data
+      const dataCounts = {
+        ability: careerData.ability.length,
+        activity: careerData.activity.length,
+        knowledge: careerData.knowledge.length,
+        preference: careerData.preference.length,
+        skills: careerData.skills.length,
+        technology: careerData.technology.length,
+        traits: careerData.traits.length,
+      };
+
+      const missingCategories = Object.entries(dataCounts)
+        .filter(([_, count]) => count === 0)
+        .map(([cat, _]) => cat);
+
+      if (missingCategories.length > 0) {
+        console.log(`⚠️ ${c.career} missing: ${missingCategories.join(", ")}`);
+      }
+
+      return careerData;
+    });
+
+    console.log("✅ Returning", finalCareers.length, "careers with full data");
 
     return NextResponse.json({
       success: true,

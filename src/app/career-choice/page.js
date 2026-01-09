@@ -99,9 +99,10 @@ export default function CareerChoicePage() {
       if (data.success) {
         console.log("Received careers data:", data.careers); // Debug log
         
-        // ✅ Log each career's data structure
-        data.careers.forEach(career => {
-          console.log(`Career: ${career.name}`, {
+        // ✅ Detailed logging for each career
+        data.careers.forEach((career, index) => {
+          const dataStatus = {
+            name: career.name,
             ability: career.ability?.length || 0,
             activity: career.activity?.length || 0,
             knowledge: career.knowledge?.length || 0,
@@ -109,8 +110,31 @@ export default function CareerChoicePage() {
             skills: career.skills?.length || 0,
             technology: career.technology?.length || 0,
             traits: career.traits?.length || 0
-          });
+          };
+          
+          console.log(`[${index + 1}] ${career.name}:`, dataStatus);
+          
+          // Log the actual data structure to see what's coming
+          if (career.ability?.length > 0) {
+            console.log(`  ✓ Sample ability:`, career.ability[0]);
+          }
+          if (career.activity?.length > 0) {
+            console.log(`  ✓ Sample activity:`, career.activity[0]);
+          }
         });
+
+        // Count careers with missing data
+        const missingDataCount = data.careers.filter(c => 
+          (!c.ability || c.ability.length === 0) &&
+          (!c.activity || c.activity.length === 0) &&
+          (!c.knowledge || c.knowledge.length === 0) &&
+          (!c.preference || c.preference.length === 0) &&
+          (!c.skills || c.skills.length === 0) &&
+          (!c.technology || c.technology.length === 0) &&
+          (!c.traits || c.traits.length === 0)
+        ).length;
+        
+        console.warn(`⚠️ ${missingDataCount} out of ${data.careers.length} careers have NO data at all!`);
 
         setCareers(data.careers);
       } else {
@@ -304,7 +328,13 @@ export default function CareerChoicePage() {
                   <td>
                     <span
                       className={`graph-icon ${hasValidData(career.ability) ? 'clickable' : 'disabled'}`}
-                      onClick={() => hasValidData(career.ability) && showTopData(career, 'ability', 'Abilities')}
+                      onClick={() => {
+                        if (hasValidData(career.ability)) {
+                          showTopData(career, 'ability', 'Abilities');
+                        } else {
+                          console.warn(`No ability data for ${career.name}`);
+                        }
+                      }}
                       title={hasValidData(career.ability) ? `View ${career.ability.length} abilities` : 'No data available'}
                     >
                       📊
@@ -315,7 +345,13 @@ export default function CareerChoicePage() {
                   <td>
                     <span
                       className={`graph-icon ${hasValidData(career.activity) ? 'clickable' : 'disabled'}`}
-                      onClick={() => hasValidData(career.activity) && showTopData(career, 'activity', 'Activities')}
+                      onClick={() => {
+                        if (hasValidData(career.activity)) {
+                          showTopData(career, 'activity', 'Activities');
+                        } else {
+                          console.warn(`No activity data for ${career.name}`);
+                        }
+                      }}
                       title={hasValidData(career.activity) ? `View ${career.activity.length} activities` : 'No data available'}
                     >
                       📊
@@ -326,7 +362,13 @@ export default function CareerChoicePage() {
                   <td>
                     <span
                       className={`graph-icon ${hasValidData(career.knowledge) ? 'clickable' : 'disabled'}`}
-                      onClick={() => hasValidData(career.knowledge) && showTopData(career, 'knowledge', 'Knowledge')}
+                      onClick={() => {
+                        if (hasValidData(career.knowledge)) {
+                          showTopData(career, 'knowledge', 'Knowledge');
+                        } else {
+                          console.warn(`No knowledge data for ${career.name}`);
+                        }
+                      }}
                       title={hasValidData(career.knowledge) ? `View ${career.knowledge.length} knowledge areas` : 'No data available'}
                     >
                       📊
@@ -337,7 +379,13 @@ export default function CareerChoicePage() {
                   <td>
                     <span
                       className={`graph-icon ${hasValidData(career.preference) ? 'clickable' : 'disabled'}`}
-                      onClick={() => hasValidData(career.preference) && showTopData(career, 'preference', 'Preference')}
+                      onClick={() => {
+                        if (hasValidData(career.preference)) {
+                          showTopData(career, 'preference', 'Preference');
+                        } else {
+                          console.warn(`No preference data for ${career.name}`);
+                        }
+                      }}
                       title={hasValidData(career.preference) ? `View ${career.preference.length} preferences` : 'No data available'}
                     >
                       📊
@@ -348,7 +396,13 @@ export default function CareerChoicePage() {
                   <td>
                     <span
                       className={`graph-icon ${hasValidData(career.skills) ? 'clickable' : 'disabled'}`}
-                      onClick={() => hasValidData(career.skills) && showTopData(career, 'skills', 'Skills')}
+                      onClick={() => {
+                        if (hasValidData(career.skills)) {
+                          showTopData(career, 'skills', 'Skills');
+                        } else {
+                          console.warn(`No skills data for ${career.name}`);
+                        }
+                      }}
                       title={hasValidData(career.skills) ? `View ${career.skills.length} skills` : 'No data available'}
                     >
                       📊
@@ -359,7 +413,13 @@ export default function CareerChoicePage() {
                   <td>
                     <span
                       className={`graph-icon ${hasValidData(career.technology) ? 'clickable' : 'disabled'}`}
-                      onClick={() => hasValidData(career.technology) && showTopData(career, 'technology', 'Technology')}
+                      onClick={() => {
+                        if (hasValidData(career.technology)) {
+                          showTopData(career, 'technology', 'Technology');
+                        } else {
+                          console.warn(`No technology data for ${career.name}`);
+                        }
+                      }}
                       title={hasValidData(career.technology) ? `View ${career.technology.length} technologies` : 'No data available'}
                     >
                       📊
@@ -370,7 +430,13 @@ export default function CareerChoicePage() {
                   <td>
                     <span
                       className={`graph-icon ${hasValidData(career.traits) ? 'clickable' : 'disabled'}`}
-                      onClick={() => hasValidData(career.traits) && showTopData(career, 'traits', 'Traits')}
+                      onClick={() => {
+                        if (hasValidData(career.traits)) {
+                          showTopData(career, 'traits', 'Traits');
+                        } else {
+                          console.warn(`No traits data for ${career.name}`);
+                        }
+                      }}
                       title={hasValidData(career.traits) ? `View ${career.traits.length} traits` : 'No data available'}
                     >
                       📊
