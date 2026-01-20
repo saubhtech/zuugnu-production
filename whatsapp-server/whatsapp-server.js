@@ -48,10 +48,10 @@ const io = new Server(httpServer, {
 });
 
 const pool = new Pool({
-  host: "localhost",
-  user: "postgres",
-  password: "Yk123@yk",
-  database: "zuugnu",
+  host: "88.222.241.228",
+  user: "saubhtech",
+  password: "Mala@Ki@Mani@1954",  // ← URL decode kiya?
+  database: "saubh",
   port: 5432,
   max: 20,
   idleTimeoutMillis: 30000,
@@ -282,12 +282,10 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
   try {
     console.log(`📱 Creating session: ${sessionId}`);
     
-    // ENHANCED: Check if we had 515 recently with longer cooldown
     if (connectionAttempts.has(sessionId)) {
       const attempts = connectionAttempts.get(sessionId);
       if (attempts.got515) {
         const timeSince515 = Date.now() - attempts.got515Time;
-        // 30 MINUTE cooldown for 515 errors
         if (timeSince515 < 30 * 60 * 1000) {
           const waitSeconds = Math.ceil((30 * 60 * 1000 - timeSince515) / 1000);
           const waitMinutes = Math.ceil(waitSeconds / 60);
@@ -303,7 +301,6 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
       }
     }
 
-    // Check normal rate limiting
     const canConnect = canAttemptConnection(sessionId);
     if (!canConnect.allowed) {
       socket?.emit("session_error", {
@@ -315,27 +312,19 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
       throw new Error(`Rate limited. Please wait ${canConnect.waitTime} seconds.`);
     }
 
-    // Record attempt BEFORE any delay
     recordConnectionAttempt(sessionId);
-    
-    // CRITICAL: Clear ALL old auth data first
     clearAuthState(sessionId);
-    
-    // Create fresh auth directory
     ensureAuthDir(sessionId);
     
-    // Add HUMAN-LIKE delay before connecting (5-8 seconds)
     console.log(`⏳ ${sessionId}: Simulating human connection delay...`);
     const humanDelay = 5000 + Math.random() * 3000;
     await new Promise(resolve => setTimeout(resolve, humanDelay));
     
-    // Get auth state AFTER delay
     const { state, saveCreds } = await useMultiFileAuthState(`./auth_${sessionId}`);
     const { version } = await fetchLatestBaileysVersion();
 
     console.log(`Using WA version ${version.join(".")}`);
 
-    // Create logger - SILENT but required
     const logger = Pino({ 
       level: "silent",
       transport: {
@@ -344,66 +333,43 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
       }
     });
     
-    // ============ CONFIGURED WHATSAPP SOCKET ============
     const sock = makeWASocket({
       version,
       auth: {
         creds: state.creds,
         keys: makeCacheableSignalKeyStore(state.keys, logger),
       },
-      
-      // CRITICAL: Use MOBILE browser fingerprint
-      browser: ["Android", "Chrome", "10.0.0"], // Mobile iOS WhatsApp
-      
-      // IMPORTANT: Tell WhatsApp this is mobile
-      mobile: false, // Keep false for WhatsApp Web but use mobile browser string
-      
-      // Connection settings optimized to avoid detection
-      connectTimeoutMs: 90000, // Longer timeout
-      keepAliveIntervalMs: 20000, // Less frequent keepalive
+      browser: ["Android", "Chrome", "10.0.0"],
+      mobile: false,
+      connectTimeoutMs: 90000,
+      keepAliveIntervalMs: 20000,
       defaultQueryTimeoutMs: 60000,
-      
-      // Event settings to reduce detection
-      emitOwnEvents: false, // Don't emit unnecessary events
-      markOnlineOnConnect: false, // Don't appear online immediately
-      syncFullHistory: false, // Don't sync old messages
-      fireInitQueries: false, // Don't query immediately
-      
-      // Aggressiveness reduction
-      retryRequestDelayMs: 10000, // Longer retry delay
-      maxMsgRetryCount: 1, // Fewer retries
-      maxCommitRetries: 1, // Fewer transaction retries
-      
-      // Resource management
+      emitOwnEvents: false,
+      markOnlineOnConnect: false,
+      syncFullHistory: false,
+      fireInitQueries: false,
+      retryRequestDelayMs: 10000,
+      maxMsgRetryCount: 1,
+      maxCommitRetries: 1,
       generateHighQualityLinkPreview: false,
       mediaCache: { maxItems: 10 },
-      
-      // Message handling
       patchMessageBeforeSending: (message) => {
-        // Clean metadata
         if (message?.reactionMessage?.key?.participant) {
           delete message.reactionMessage.key.participant;
         }
         return message;
       },
-      
-      // Ignore unnecessary traffic
       shouldIgnoreJid: (jid) => {
         return jid?.endsWith('@broadcast') || 
                jid?.endsWith('@newsletter') ||
                jid?.includes('status');
       },
-      
-      // Required
       getMessage: async () => undefined,
       logger: logger,
     });
-    // ============ END CONFIGURATION ============
 
-    // Handle credentials update
     sock.ev.on("creds.update", saveCreds);
 
-    // ENHANCED connection handler with delays
     sock.ev.on("connection.update", async (update) => {
       const { connection, lastDisconnect, qr, isNewLogin } = update;
       
@@ -413,12 +379,10 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
         isNewLogin 
       });
       
-      // ============ QR CODE HANDLING WITH DELAY ============
       if (qr) {
         console.log(`🔲 QR Code generated for ${sessionId}`);
         
         try {
-          // CRITICAL: Delay QR emission (simulates network latency)
           await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
           
           const qrDataURL = await qrcode.toDataURL(qr);
@@ -428,7 +392,7 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
             socket.emit("qr", { 
               sessionId, 
               qr: qrDataURL,
-              expiresIn: 35000, // 35 seconds
+              expiresIn: 35000,
               message: "Scan within 35 seconds"
             });
           }
@@ -439,7 +403,6 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
             expiresIn: 35000
           });
           
-          // Auto-expire QR after timeout
           setTimeout(() => {
             if (sessions.has(sessionId) && connection !== "open") {
               console.log(`⏰ ${sessionId}: QR expired`);
@@ -452,11 +415,9 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
         }
       }
       
-      // ============ SUCCESSFUL CONNECTION ============
       if (connection === "open") {
         console.log(`✅ ${sessionId} connected successfully!`);
         
-        // Small delay before emitting success
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         const user = sock.user;
@@ -465,10 +426,8 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
         await saveSession(sessionId, sessionName, phone, "connected");
         sessions.set(sessionId, sock);
         
-        // Reset connection attempts on success
         connectionAttempts.delete(sessionId);
 
-        // Prepare session data
         const sessionData = {
           sessionId,
           phone,
@@ -478,7 +437,6 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
           platform: "whatsapp-web"
         };
         
-        // Emit success events with delay between them
         if (socket?.connected) {
           socket.emit("connected", sessionData);
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -489,9 +447,17 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
         setTimeout(() => {
           io.to(sessionId).emit("session_ready", sessionData);
         }, 1000);
+
+        // ✅ MESSAGE LISTENER - YAHAN ADD KARO!
+        sock.ev.on("messages.upsert", async ({ messages, type }) => {
+          if (type === "notify") {
+            for (const msg of messages) {
+              await processIncomingMessage(sock, sessionId, msg);
+            }
+          }
+        });
       }
       
-      // ============ CONNECTION CLOSED ============
       if (connection === "close") {
         const statusCode = lastDisconnect?.error?.output?.statusCode;
         const error = lastDisconnect?.error;
@@ -510,22 +476,16 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
           timestamp: new Date().toISOString()
         });
         
-        // ============ ERROR 515 HANDLING ============
         if (statusCode === 515) {
           console.log(`🚨 ${sessionId}: Error 515 detected! Clearing auth...`);
           
-          // Enhanced 515 handling with longer cooldown
           recordConnectionAttempt(sessionId, true);
-          
-          // Clear auth immediately
           clearAuthState(sessionId);
           
-          // Wait before notifying
           await new Promise(resolve => setTimeout(resolve, 2000));
           
-          // Progressive cooldown: longer wait for repeated 515s
           const attempts = connectionAttempts.get(sessionId);
-          const cooldownMinutes = Math.min(30 + (attempts.count * 10), 120); // 30min to 2hrs
+          const cooldownMinutes = Math.min(30 + (attempts.count * 10), 120);
           
           if (socket?.connected) {
             socket.emit("error_515", {
@@ -538,7 +498,6 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
             });
           }
           
-          // Also emit to room
           io.to(sessionId).emit("session:error", {
             sessionId,
             error: "whatsapp_rejected",
@@ -546,22 +505,18 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
             message: `WhatsApp rejected connection. IP flagged for ${cooldownMinutes} minutes.`,
             retryAfter: Date.now() + (cooldownMinutes * 60 * 1000)
           });
-        }
-        
-        // Handle timeout (408)
-        else if (statusCode === 408) {
+        } else if (statusCode === 408) {
           console.log(`⏰ ${sessionId}: Connection timed out`);
           io.to(sessionId).emit("session:error", {
             sessionId,
             error: "connection_timeout",
             code: 408,
             message: "QR code expired. Please try again.",
-            retryAfter: Date.now() + (2 * 60 * 1000) // 2 minutes
+            retryAfter: Date.now() + (2 * 60 * 1000)
           });
         }
       }
       
-      // ============ CONNECTING STATE ============
       if (connection === "connecting") {
         console.log(`🔄 ${sessionId}: Connecting to WhatsApp...`);
         if (socket?.connected) {
@@ -578,7 +533,6 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
   } catch (error) {
     console.error(`❌ Error creating session ${sessionId}:`, error);
     
-    // Enhanced error reporting
     if (socket?.connected) {
       socket.emit("session_error", {
         sessionId,
@@ -588,7 +542,6 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
       });
     }
     
-    // Cleanup on error
     if (error.message.includes("515") || error.message.includes("flagged")) {
       clearAuthState(sessionId);
     }
@@ -596,6 +549,45 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
     throw error;
   }
 }
+
+// ====== LOGIN FEATURE HELPERS ======
+
+// Generate password matching your style (4 chars alphanumeric + optional symbol)
+function generatePassword() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let pass = "";
+  for (let i = 0; i < 4; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+  return pass; // Example: JSKL / LGWU / E7XA
+}
+
+// Find user by phone
+async function findUserByPhone(phone) {
+  try {
+    const res = await pool.query(
+      `SELECT * FROM whatsapp_users WHERE phone = $1 AND is_active = true LIMIT 1`,
+      [phone]
+    );
+    return res.rows.length ? res.rows[0] : null;
+  } catch (err) {
+    console.error("DB findUserByPhone error:", err);
+    return null;
+  }
+}
+
+// Update password + last_login
+async function updateUserPassword(phone, newPass) {
+  try {
+    await pool.query(
+      `UPDATE whatsapp_users SET password = $1, last_login = NOW() WHERE phone = $2`,
+      [newPass, phone]
+    );
+    return true;
+  } catch (err) {
+    console.error("DB updateUserPassword error:", err);
+    return false;
+  }
+}
+
 // Process incoming message
 async function processIncomingMessage(sock, sessionId, msg) {
   try {
@@ -638,6 +630,75 @@ async function processIncomingMessage(sock, sessionId, msg) {
 
     if (fromMe) return;
 
+    // 🟨 Normalize text for commands
+    const lower = messageText.trim().toLowerCase();
+
+    // 🟩 LOGIN PASSWORD RESET
+   // 🟩 LOGIN PASSWORD RESET (UPDATED)
+if (lower === "login" || lower === "signin" || lower === "log") {
+  const u = await findUserByPhone(senderPhone);
+
+  if (!u) {
+    await sock.sendMessage(chatId, {
+      text: `❌ You are not registered.\nSend: "Register Your Name"`
+    });
+    return;
+  }
+
+  const newPass = generatePassword();
+  await updateUserPassword(senderPhone, newPass);
+
+  await sock.sendMessage(chatId, {
+    text:
+      `👋 Hello ${u.name}\n` +
+      `🔐 New Password: *${newPass}*\n\n` +
+      `🌐 Login: https://crm.saubh.in\n` +
+      `📱 User ID: ${senderPhone}`
+  });
+
+  return;
+}
+
+    // 🟦 REGISTER HANDLER
+    if (lower.startsWith("register")) {
+      const name = messageText.replace(/register/i, "").trim();
+
+      if (!name) {
+        await sock.sendMessage(chatId, {
+          text: `👤 Send like: Register Yash Singh`
+        });
+        return;
+      }
+
+      const u = await findUserByPhone(senderPhone);
+
+      if (u) {
+        await sock.sendMessage(chatId, {
+          text:
+            `Hello ${u.name}! 👋\n\n` +
+            `You are already registered.\n\n` +
+            `🧾 User ID: ${senderPhone}\n` +
+            `🔐 Password: ${u.password}\n\n` +
+            `Login at: https://crm.saubh.in`
+        });
+        return;
+      }
+
+      const pass = generatePassword();
+      await registerUser(senderPhone, name, pass);
+
+      await sock.sendMessage(chatId, {
+        text:
+          `Welcome ${name}! 🎉\n\n` +
+          `🧾 User ID: ${senderPhone}\n` +
+          `🔐 Password: ${pass}\n\n` +
+          `Login at: https://crm.saubh.in`
+      });
+
+      return;
+    }
+
+    // 🟨 CONTACT + CHAT LOGGING
     const contactName = msg.pushName || senderPhone;
     const contactId = await saveContact(senderPhone, contactName);
 
@@ -677,6 +738,7 @@ async function processIncomingMessage(sock, sessionId, msg) {
     console.error("Error processing message:", error);
   }
 }
+
 
 function setupMessageListener(sock, sessionId) {
   // Already handled in createSession
