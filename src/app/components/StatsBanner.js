@@ -47,6 +47,23 @@ export default function StatsBanner() {
           <div className="stat-label">Phygital Availability</div>
         </div>
       </div>
+
+      {/* Video Section */}
+      <div className="stats-video">
+        <video
+          src="/video-professionalism.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{
+            width: "100%",
+            borderRadius: "12px",
+            marginBottom: "20px",
+            objectFit: "cover"
+          }}
+        />
+      </div>
     </section>
   );
 }

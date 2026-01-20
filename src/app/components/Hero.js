@@ -5,7 +5,7 @@ export default function Hero() {
     <section className="hero">
       <div className="hero-content">
         <h1>
-          Community-Driven Phygital{' '}
+          Community-Verified Marketplace{' '}
           <span className="highlight">
             <br />
             Gig-Work Aggregator Platform
