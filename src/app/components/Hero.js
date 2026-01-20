@@ -13,7 +13,7 @@ export default function Hero() {
         </h1>
         <div className="hero-description">
           <h3 align="justify">
-            💼 Businesses can use Zuugnu's Operating System to manage operations, outsource requirements, build brands, and generate organic leads.
+            💼 Businesses can use Saubh.Tech Operating System to manage operations, outsource requirements, build brands, and generate organic leads.
           </h3>
           <br />
           <h3 align="justify">

@@ -15,7 +15,7 @@ export default function Header() {
               priority
             />
           </div>
-          <span className="logo-text">Zuugnu</span>
+          <span className="logo-text">Saubh.Tech</span>
         </div>
         <ul className="nav-menu">
           <li>

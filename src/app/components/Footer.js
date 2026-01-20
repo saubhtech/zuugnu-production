@@ -23,7 +23,7 @@ export default function Footer() {
 
         <div className="footer-content">
           <div className="footer-section">
-            <h4>Zuugnu</h4>
+            <h4>Saubh.Tech</h4>
             <ul>
               <li>
                 <Link href="#">About Us</Link>
