@@ -12,6 +12,7 @@ export default function PricingSection() {
             <div className="plan-price">
               ₹9,999<span>/month</span>
             </div>
+            
             <div className="plan-features">
               <div className="plan-feature">
                 <strong>UGC</strong>

@@ -1,4 +1,4 @@
-// whatsapp-server.js - FIXED FOR ERROR 515
+// whatsapp-server.js - COMPLETE FIXED VERSION WITH LOGIN FEATURE
 import { Browsers } from "@whiskeysockets/baileys";
 import express from "express";
 import { createServer } from "http";
@@ -50,7 +50,7 @@ const io = new Server(httpServer, {
 const pool = new Pool({
   host: "88.222.241.228",
   user: "saubhtech",
-  password: "Mala@Ki@Mani@1954",  // ← URL decode kiya?
+  password: "ManiKiMala1954",  // ✅ CORRECT PASSWORD
   database: "saubh",
   port: 5432,
   max: 20,
@@ -62,7 +62,7 @@ pool.on("connect", () => console.log("✅ Database connected"));
 pool.on("error", (err) => console.error("❌ Database error:", err));
 
 const sessions = new Map();
-const connectionAttempts = new Map(); // Track connection attempts
+const connectionAttempts = new Map();
 const logger = Pino({ level: "silent" });
 
 // Ensure auth directories exist
@@ -79,11 +79,9 @@ function clearAuthState(sessionId) {
   const authDir = path.join(__dirname, `auth_${sessionId}`);
   try {
     if (fs.existsSync(authDir)) {
-      // Remove entire directory
       fs.rmSync(authDir, { recursive: true, force: true });
       console.log(`🗑️  Completely cleared auth for ${sessionId}`);
       
-      // Also delete any .json files in root
       const rootFiles = fs.readdirSync(__dirname);
       rootFiles.forEach(file => {
         if (file.startsWith(`auth_${sessionId}`) || 
@@ -109,7 +107,6 @@ function canAttemptConnection(sessionId) {
   const now = Date.now();
   const timeSinceLastAttempt = now - attempts.lastAttempt;
 
-  // If error 515 occurred, require 10 minute wait (increased from 5)
   if (attempts.got515) {
     const timeSince515 = now - attempts.got515Time;
     if (timeSince515 < 10 * 60 * 1000) {
@@ -123,7 +120,6 @@ function canAttemptConnection(sessionId) {
         reason: "error_515_cooldown",
       };
     } else {
-      // Clear 515 flag after cooldown period
       attempts.got515 = false;
       attempts.got515Time = 0;
       attempts.count = 0;
@@ -131,7 +127,6 @@ function canAttemptConnection(sessionId) {
     }
   }
 
-  // Normal rate limiting: max 2 attempts per 2 hours (more conservative)
   if (attempts.count >= 2 && timeSinceLastAttempt < 2 * 60 * 60 * 1000) {
     const remainingTime = Math.ceil(
       (2 * 60 * 60 * 1000 - timeSinceLastAttempt) / 1000
@@ -144,7 +139,6 @@ function canAttemptConnection(sessionId) {
     };
   }
 
-  // Reset counter if cooldown period has passed
   if (timeSinceLastAttempt > 2 * 60 * 60 * 1000) {
     attempts.count = 0;
   }
@@ -174,7 +168,6 @@ function recordConnectionAttempt(sessionId, got515 = false) {
 
   connectionAttempts.set(sessionId, attempts);
 
-  // Log current state
   console.log(
     `📊 ${sessionId} attempts: ${attempts.count}, last: ${new Date(
       attempts.lastAttempt
@@ -182,7 +175,7 @@ function recordConnectionAttempt(sessionId, got515 = false) {
   );
 }
 
-// Database helper functions (same as before)
+// Database helper functions
 async function saveContact(phone, name, profilePic = null) {
   try {
     const query = `
@@ -276,8 +269,100 @@ async function saveMessage(
   }
 }
 
-// CREATE WHATSAPP SESSION - FIXED CONFIGURATION
-// CREATE WHATSAPP SESSION - COMPREHENSIVE 515 FIX
+// ====== LOGIN FEATURE HELPER FUNCTIONS ======
+
+// Generate password matching format: YK123@ (FirstInitial + LastInitial + 3Digits + @)
+function generatePassword(name) {
+  const nameParts = name.trim().split(" ");
+  const firstInitial = nameParts[0]?.charAt(0).toUpperCase() || "U";
+  const lastInitial = nameParts[nameParts.length - 1]?.charAt(0).toUpperCase() || "S";
+  const randomNum = Math.floor(100 + Math.random() * 900); // 100-999 (3 digits)
+  
+  return `${firstInitial}${lastInitial}${randomNum}@`;
+  // Examples:
+  // "Yash Singh" → YS847@
+  // "John Doe" → JD234@
+  // "Kumar" → KR567@ (first and last same)
+}
+
+// Find user by phone number
+async function findUserByPhone(phone) {
+  try {
+    const res = await pool.query(
+      `SELECT id, phone, name, password, is_active, role, created_at, last_login 
+       FROM whatsapp_users 
+       WHERE phone = $1 AND is_active = true 
+       LIMIT 1`,
+      [phone]
+    );
+    if (res.rows.length > 0) {
+      console.log(`✅ User found: ${res.rows[0].name} (${phone})`);
+      return res.rows[0];
+    }
+    console.log(`❌ No user found for phone: ${phone}`);
+    return null;
+  } catch (err) {
+    console.error("❌ DB findUserByPhone error:", err);
+    return null;
+  }
+}
+
+// Update user password and last_login timestamp
+async function updateUserPassword(phone, newPass) {
+  try {
+    const res = await pool.query(
+      `UPDATE whatsapp_users 
+       SET password = $1, 
+           last_login = NOW(), 
+           updated_at = NOW() 
+       WHERE phone = $2 
+       RETURNING id, name, password`,
+      [newPass, phone]
+    );
+    
+    if (res.rows.length > 0) {
+      console.log(`✅ Password updated for ${res.rows[0].name}: ${newPass}`);
+      return true;
+    }
+    
+    console.log(`❌ No user found to update password for: ${phone}`);
+    return false;
+  } catch (err) {
+    console.error("❌ DB updateUserPassword error:", err);
+    return false;
+  }
+}
+
+// Register new user (INSERT or UPDATE if exists)
+async function registerUser(phone, name, password) {
+  try {
+    const res = await pool.query(
+      `INSERT INTO whatsapp_users (phone, name, password, is_active, role, created_at, last_login, updated_at)
+       VALUES ($1, $2, $3, true, 'user', NOW(), NOW(), NOW())
+       ON CONFLICT (phone) DO UPDATE 
+       SET name = EXCLUDED.name, 
+           password = EXCLUDED.password,
+           last_login = NOW(),
+           updated_at = NOW(),
+           is_active = true
+       RETURNING id, phone, name, password`,
+      [phone, name, password]
+    );
+    
+    if (res.rows.length > 0) {
+      console.log(`✅ User registered/updated: ${res.rows[0].name} (${phone}) with password: ${password}`);
+      return res.rows[0];
+    }
+    
+    return null;
+  } catch (err) {
+    console.error("❌ DB registerUser error:", err);
+    console.error("Error details:", err.message);
+    return null;
+  }
+}
+
+// CREATE WHATSAPP SESSION
 async function createSession(sessionId, sessionName = "Session", socket = null) {
   try {
     console.log(`📱 Creating session: ${sessionId}`);
@@ -448,7 +533,7 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
           io.to(sessionId).emit("session_ready", sessionData);
         }, 1000);
 
-        // ✅ MESSAGE LISTENER - YAHAN ADD KARO!
+        // ✅ MESSAGE LISTENER
         sock.ev.on("messages.upsert", async ({ messages, type }) => {
           if (type === "notify") {
             for (const msg of messages) {
@@ -550,45 +635,7 @@ async function createSession(sessionId, sessionName = "Session", socket = null) 
   }
 }
 
-// ====== LOGIN FEATURE HELPERS ======
-
-// Generate password matching your style (4 chars alphanumeric + optional symbol)
-function generatePassword() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let pass = "";
-  for (let i = 0; i < 4; i++) pass += chars[Math.floor(Math.random() * chars.length)];
-  return pass; // Example: JSKL / LGWU / E7XA
-}
-
-// Find user by phone
-async function findUserByPhone(phone) {
-  try {
-    const res = await pool.query(
-      `SELECT * FROM whatsapp_users WHERE phone = $1 AND is_active = true LIMIT 1`,
-      [phone]
-    );
-    return res.rows.length ? res.rows[0] : null;
-  } catch (err) {
-    console.error("DB findUserByPhone error:", err);
-    return null;
-  }
-}
-
-// Update password + last_login
-async function updateUserPassword(phone, newPass) {
-  try {
-    await pool.query(
-      `UPDATE whatsapp_users SET password = $1, last_login = NOW() WHERE phone = $2`,
-      [newPass, phone]
-    );
-    return true;
-  } catch (err) {
-    console.error("DB updateUserPassword error:", err);
-    return false;
-  }
-}
-
-// Process incoming message
+// ====== PROCESS INCOMING MESSAGE WITH LOGIN/REGISTER HANDLERS ======
 async function processIncomingMessage(sock, sessionId, msg) {
   try {
     if (!msg.message) return;
@@ -633,72 +680,145 @@ async function processIncomingMessage(sock, sessionId, msg) {
     // 🟨 Normalize text for commands
     const lower = messageText.trim().toLowerCase();
 
-    // 🟩 LOGIN PASSWORD RESET
-   // 🟩 LOGIN PASSWORD RESET (UPDATED)
-if (lower === "login" || lower === "signin" || lower === "log") {
-  const u = await findUserByPhone(senderPhone);
+    // =================================================================
+    // 🟩 LOGIN / PASSWORD RESET HANDLER
+    // =================================================================
+    if (lower === "login" || lower === "signin" || lower === "log" || lower === "reset password") {
+      console.log(`🔐 Login request from ${senderPhone}`);
+      
+      const user = await findUserByPhone(senderPhone);
 
-  if (!u) {
-    await sock.sendMessage(chatId, {
-      text: `❌ You are not registered.\nSend: "Register Your Name"`
-    });
-    return;
-  }
-
-  const newPass = generatePassword();
-  await updateUserPassword(senderPhone, newPass);
-
-  await sock.sendMessage(chatId, {
-    text:
-      `👋 Hello ${u.name}\n` +
-      `🔐 New Password: *${newPass}*\n\n` +
-      `🌐 Login: https://crm.saubh.in\n` +
-      `📱 User ID: ${senderPhone}`
-  });
-
-  return;
-}
-
-    // 🟦 REGISTER HANDLER
-    if (lower.startsWith("register")) {
-      const name = messageText.replace(/register/i, "").trim();
-
-      if (!name) {
+      if (!user) {
+        console.log(`❌ User not found for login: ${senderPhone}`);
         await sock.sendMessage(chatId, {
-          text: `👤 Send like: Register Yash Singh`
+          text: 
+            `❌ *You are not registered yet.*\n\n` +
+            `📝 To register, send:\n` +
+            `*Register Your Full Name*\n\n` +
+            `Example: Register Yash Singh`
         });
         return;
       }
 
-      const u = await findUserByPhone(senderPhone);
+      // Generate new password using user's name
+      const newPassword = generatePassword(user.name);
+      console.log(`🔑 Generated new password for ${user.name}: ${newPassword}`);
+      
+      const updated = await updateUserPassword(senderPhone, newPassword);
 
-      if (u) {
+      if (updated) {
+        console.log(`✅ Password reset successful for ${user.name}`);
         await sock.sendMessage(chatId, {
           text:
-            `Hello ${u.name}! 👋\n\n` +
-            `You are already registered.\n\n` +
-            `🧾 User ID: ${senderPhone}\n` +
-            `🔐 Password: ${u.password}\n\n` +
-            `Login at: https://crm.saubh.in`
+            `🔐 *Password Reset Successful!*\n\n` +
+            `👋 Hello *${user.name}*!\n\n` +
+            `📱 *User ID:* ${senderPhone}\n` +
+            `🔑 *New Password:* \`${newPassword}\`\n\n` +
+            `🌐 *Login at:* https://crm.saubh.in\n\n` +
+            `⚡ This password has been updated in our database.\n` +
+            `💡 Save it securely!`
         });
-        return;
+      } else {
+        console.log(`❌ Failed to update password for ${user.name}`);
+        await sock.sendMessage(chatId, {
+          text: 
+            `❌ *Failed to reset password.*\n\n` +
+            `Please try again in a moment or contact support.`
+        });
       }
-
-      const pass = generatePassword();
-      await registerUser(senderPhone, name, pass);
-
-      await sock.sendMessage(chatId, {
-        text:
-          `Welcome ${name}! 🎉\n\n` +
-          `🧾 User ID: ${senderPhone}\n` +
-          `🔐 Password: ${pass}\n\n` +
-          `Login at: https://crm.saubh.in`
-      });
 
       return;
     }
 
+    // =================================================================
+    // 🟦 REGISTER HANDLER
+    // =================================================================
+    if (lower.startsWith("register")) {
+      console.log(`👤 Registration request from ${senderPhone}`);
+      
+      const name = messageText.replace(/register/i, "").trim();
+
+      if (!name || name.length < 2) {
+        console.log(`❌ Invalid name provided: "${name}"`);
+        await sock.sendMessage(chatId, {
+          text: 
+            `❌ *Please provide your full name.*\n\n` +
+            `📝 *Format:*\n` +
+            `Register Your Full Name\n\n` +
+            `✅ *Example:*\n` +
+            `Register Yash Singh`
+        });
+        return;
+      }
+
+      const existingUser = await findUserByPhone(senderPhone);
+
+      if (existingUser) {
+        console.log(`ℹ️ User already registered: ${existingUser.name} (${senderPhone})`);
+        await sock.sendMessage(chatId, {
+          text:
+            `👋 Hello *${existingUser.name}*!\n\n` +
+            `✅ *You are already registered.*\n\n` +
+            `📱 *User ID:* ${senderPhone}\n` +
+            `🔑 *Your Password:* \`${existingUser.password}\`\n\n` +
+            `🌐 *Login at:* https://crm.saubh.in\n\n` +
+            `💡 *Forgot password?*\n` +
+            `Send "*login*" to get a new password.`
+        });
+        return;
+      }
+
+      const password = generatePassword(name);
+      console.log(`🔑 Generated password for ${name}: ${password}`);
+      
+      const registeredUser = await registerUser(senderPhone, name, password);
+
+      if (registeredUser) {
+        console.log(`✅ New user registered successfully: ${name} (${senderPhone})`);
+        await sock.sendMessage(chatId, {
+          text:
+            `🎉 *Welcome ${name}!*\n\n` +
+            `✅ *Registration Successful*\n\n` +
+            `📱 *User ID:* ${senderPhone}\n` +
+            `🔑 *Password:* \`${password}\`\n\n` +
+            `🌐 *Login at:* https://crm.saubh.in\n\n` +
+            `💾 *Save this password!*\n` +
+            `💡 You can reset it anytime by sending "*login*"`
+        });
+      } else {
+        console.log(`❌ Registration failed for ${name} (${senderPhone})`);
+        await sock.sendMessage(chatId, {
+          text: 
+            `❌ *Registration failed.*\n\n` +
+            `Please try again or contact our support team.`
+        });
+      }
+
+      return;
+    }
+
+    // =================================================================
+    // 🟨 HELP COMMAND
+    // =================================================================
+    if (lower === "help" || lower === "commands") {
+      await sock.sendMessage(chatId, {
+        text:
+          `📋 *Available Commands:*\n\n` +
+          `1️⃣ *Register* - Create new account\n` +
+          `   Format: Register Your Name\n` +
+          `   Example: Register Yash Singh\n\n` +
+          `2️⃣ *Login* - Get new password\n` +
+          `   Send: login\n\n` +
+          `3️⃣ *Help* - Show this menu\n` +
+          `   Send: help\n\n` +
+          `🌐 *Website:* https://crm.saubh.in`
+      });
+      return;
+    }
+
+    // =================================================================
     // 🟨 CONTACT + CHAT LOGGING
+    // =================================================================
     const contactName = msg.pushName || senderPhone;
     const contactId = await saveContact(senderPhone, contactName);
 
@@ -737,11 +857,6 @@ if (lower === "login" || lower === "signin" || lower === "log") {
   } catch (error) {
     console.error("Error processing message:", error);
   }
-}
-
-
-function setupMessageListener(sock, sessionId) {
-  // Already handled in createSession
 }
 
 // Socket.IO handlers
@@ -921,7 +1036,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// API Endpoints (same as before)
+// API Endpoints
 app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
@@ -992,16 +1107,18 @@ const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`
 ╔═══════════════════════════════════════════╗
-║   🚀 WhatsApp Server v4.0 - ERROR 515 FIX║
+║   🚀 WhatsApp Server v5.0 - WITH LOGIN   ║
 ║   📡 Port: ${PORT}                          ║
 ║   📍 Host: 0.0.0.0                       ║
 ║   🔌 WebSocket: Ready                    ║
 ║   💾 PostgreSQL: Active                  ║
 ║   ⚡ Baileys: v7.0.0-rc.9                ║
-║   ✅ Fixed Error 515 + Rate Limiting     ║
+║   ✅ Login Feature: Active                ║
+║   ✅ Password Format: YS123@             ║
 ╚═══════════════════════════════════════════╝
   `);
   console.log(`\n📱 Open: http://localhost:3000/dashboard/sessions`);
   console.log(`🔗 WebSocket: ws://localhost:${PORT}`);
   console.log(`🩺 Health: http://localhost:${PORT}/api/health\n`);
+  console.log(`📋 Commands: Register [Name] | login | help`);
 });
